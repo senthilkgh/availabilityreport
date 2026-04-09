@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Customer Success – Linux & AIX | Hybrid Cloud Enablement - Host Availability Report Builder</title>
+<script src="xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial,sans-serif;font-size:13px;color:#1a1a1a;background:#fff;padding:20px;}
+h2{font-size:18px;font-weight:700;margin-bottom:2px;}
+.sub{font-size:12px;color:#888;margin-bottom:16px;}
+.tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{padding:7px 16px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;}
+.tab.active{background:#e8eeff;border-color:#3b5bdb;font-weight:700;color:#3b5bdb;}
+.sec{display:none;}
+.sec.on{display:block;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+.ubox{border:2px dashed #ccc;border-radius:8px;padding:20px 14px;text-align:center;cursor:pointer;background:#fafafa;}
+.ubox:hover{background:#f0f4ff;}
+.ubox input[type=file]{display:none;}
+.cmap{font-size:11px;color:#555;margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;line-height:2.4;}
+.rbox{background:#f7f7f7;border-radius:8px;padding:14px;margin-bottom:14px;}
+.tbox{background:#fff;border:1px solid #ddd;border-radius:8px;padding:14px;margin-bottom:14px;}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.tcard{background:#f7f7f7;border-radius:6px;padding:10px 14px;}
+.tcard-title{font-weight:700;font-size:13px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #ddd;}
+.trow{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;}
+.trow label{color:#555;flex:1;}
+.trow input[type=number]{width:70px;padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;text-align:center;}
+.trow select{padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;flex:1.5;}
+.rcards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.rc{padding:9px 12px;border-radius:6px;font-size:12px;line-height:1.5;}
+.rc strong{display:block;margin-bottom:2px;font-size:13px;}
+.rc span{color:#555;}
+.pbox{background:#f0f4ff;border:1px solid #3b5bdb;border-radius:8px;padding:14px;margin-top:14px;}
+.pbar-wrap{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.pbar-track{flex:1;background:#dde;border-radius:999px;height:16px;overflow:hidden;border:1px solid #aab;}
+.pbar-fill{height:100%;border-radius:999px;background:#3b5bdb;width:0%;transition:width 0.3s;}
+.pbar-lbl{font-size:12px;font-weight:700;min-width:140px;text-align:right;color:#333;}
+.pbar-status{font-size:12px;color:#444;margin:0;}
+.bulk{background:#f7f7f7;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
+.toolbar input,.toolbar select{padding:5px 8px;border:1px solid #ccc;border-radius:6px;font-size:13px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;padding:7px 8px;font-size:11px;color:#555;border-bottom:1px solid #ddd;font-weight:700;white-space:nowrap;}
+td{padding:5px 8px;border-bottom:1px solid #eee;vertical-align:middle;}
+td select,td input[type=text]{width:100%;padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;}
+.rsel{background:#eef3ff!important;}
+.runc{background:#fffbea;}
+.rdup{background:#fff0f8!important;border-left:3px solid #d63384;}
+.rdup-first{background:#fff0f8!important;border-left:3px solid #d63384;border-top:2px solid #d63384;}
+.rdup-last{background:#fff0f8!important;border-left:3px solid #d63384;border-bottom:2px solid #d63384;}
+.banner{padding:9px 14px;border-radius:6px;margin-bottom:12px;font-size:13px;}
+.ban-w{background:#fff3cd;border:1px solid #ffc107;color:#856404;}
+.ban-ok{background:#d4edda;border:1px solid #28a745;color:#155724;}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px;}
+.mc{background:#f7f7f7;border-radius:8px;padding:12px 14px;}
+.mc .lb{font-size:11px;color:#666;margin-bottom:4px;}
+.mc .vl{font-size:20px;font-weight:700;}
+.brow{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+.blbl{min-width:260px;font-size:13px;}
+.btrk{flex:1;background:#eee;border-radius:4px;height:16px;overflow:hidden;}
+.bfil{height:100%;border-radius:4px;}
+.bcnt{min-width:80px;text-align:right;font-size:12px;color:#666;}
+.btnp{padding:7px 16px;border:1px solid #3b5bdb;border-radius:6px;background:#3b5bdb;color:#fff;font-weight:700;font-size:13px;cursor:pointer;}
+.btnp:disabled{opacity:0.5;cursor:not-allowed;}
+.btns{padding:7px 16px;border:1px solid #ccc;border-radius:6px;background:#f0f0f0;font-weight:600;font-size:13px;cursor:pointer;}
+.btnsm{padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#f0f0f0;font-size:12px;cursor:pointer;}
+.btngrn{padding:7px 14px;border:1px solid #198754;border-radius:6px;background:#198754;color:#fff;font-weight:700;font-size:12px;cursor:pointer;}
+.btnorg{padding:7px 14px;border:1px solid #e67700;border-radius:6px;background:#e67700;color:#fff;font-weight:700;font-size:12px;cursor:pointer;}
+.smsel{padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;}
+.sminp{padding:2px 5px;border:1px solid #ccc;border-radius:4px;font-size:12px;}
+.notebox{background:#e8f0fe;border-left:4px solid #3b5bdb;padding:10px 14px;border-radius:4px;font-size:12px;margin-bottom:14px;line-height:1.6;}
+.avok{color:#198754;font-weight:700;}
+.avwn{color:#e67700;font-weight:700;}
+.aver{color:#c0392b;font-weight:700;}
+.nfb{background:#1e1e1e;color:#d4d4d4;padding:14px;border-radius:8px;font-family:Consolas,monospace;font-size:12px;white-space:pre;overflow-x:auto;line-height:1.6;margin:10px 0 14px;}
+.kw{color:#569cd6;}.str{color:#ce9178;}.cm{color:#6a9955;}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;}
+.b-ok{background:#d4edda;color:#155724;}
+.b-ret{background:#ede9ff;color:#4a3fa0;}
+.b-mnt{background:#fde8e8;color:#a02020;}
+.b-act{background:#d4edda;color:#155724;}
+.b-new{background:#d4f5e9;color:#0d6e4a;}
+.b-pup{background:#d4edda;color:#155724;}
+.b-pdn{background:#f8d7da;color:#721c24;}
+.b-pna{background:#e2e3e5;color:#383d41;}
+.b-prod{background:#fff3cd;color:#856404;}
+.b-nonp{background:#e8f0fe;color:#1a56a0;}
+.b-warn{background:#fff3cd;color:#856404;}
+.b-blank{background:#fff3cd;color:#856404;font-size:10px;}
+.b-hcnm{background:#fde8e8;color:#7a1010;font-size:11px;}
+.b-dup{background:#ffe0f0;color:#d63384;font-size:11px;}
+.b-ansible{background:#e0f7fa;color:#006064;font-size:11px;}
+.dup-group-label{font-size:10px;color:#d63384;font-weight:700;white-space:nowrap;}
+.author-footer{margin-top:28px;padding:10px 16px;background:#f0f4ff;border:1px solid #c5d0f5;border-radius:8px;font-size:11px;color:#555;display:flex;align-items:center;gap:8px;}
+.author-footer span.af-label{font-weight:700;color:#3b5bdb;}
+/* trim tool */
+.trim-box{background:#f0fff4;border:1px solid #28a745;border-radius:8px;padding:12px 14px;margin-top:10px;font-size:12px;}
+.trim-box h4{color:#155724;font-size:12px;font-weight:700;margin-bottom:8px;}
+.trim-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+.trim-preview{background:#fff;border:1px solid #ccc;border-radius:4px;padding:4px 8px;font-family:monospace;font-size:11px;color:#3b5bdb;min-width:120px;}
+/* workflow */
+#sec-workflow{background:#f9fafb;}
+.wf-wrap{max-width:920px;margin:0 auto;padding:10px 0;}
+.wf-title{font-size:16px;font-weight:700;color:#1a1a1a;margin-bottom:4px;}
+.wf-sub{font-size:12px;color:#888;margin-bottom:20px;}
+.wf-step{display:flex;gap:14px;margin-bottom:18px;align-items:flex-start;}
+.wf-num{min-width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;}
+.wf-body{flex:1;}
+.wf-body strong{display:block;font-size:13px;margin-bottom:3px;}
+.wf-body p{font-size:12px;color:#555;line-height:1.6;}
+.wf-arrow{text-align:center;color:#ccc;font-size:20px;margin:-8px 0 -2px 22px;}
+.wf-tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:10px;font-weight:700;margin-right:4px;margin-top:2px;}
+.wf-optional{background:#fff3cd;color:#856404;}
+.wf-required{background:#fde8e8;color:#c0392b;}
+.wf-auto{background:#d4edda;color:#155724;}
+.wf-divider{border:none;border-top:2px dashed #e0e0e0;margin:20px 0;}
+.dl-wf-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border:1px solid #3b5bdb;border-radius:6px;background:#3b5bdb;color:#fff;font-weight:700;font-size:13px;cursor:pointer;margin-bottom:18px;}
+@media(max-width:700px){.g3,.g4,.metrics,.rcards,.tgrid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<h2>&#128640; Customer Success – Linux &amp; AIX | Hybrid Cloud Enablement - Host Availability Report Builder &#x23f1;</h2>
+<p class="sub">Dynatrace + CMDB + Ping Results + Ansible Check Results &rarr; Categorized Excel Report</p>
+
+<!-- INSTRUCTION PANEL -->
+<div id="info-panel" style="background:#fffbe6;border:1px solid #f0c040;border-radius:8px;padding:16px 20px;margin-bottom:18px;">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+    <p style="font-weight:700;font-size:14px;color:#7a5800;margin-bottom:10px;">&#x1F4CB; Before You Start — Read This</p>
+    <button onclick="document.getElementById('info-panel').style.display='none'" style="background:none;border:none;font-size:18px;cursor:pointer;color:#7a5800;line-height:1;" title="Dismiss">&#10005;</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:12px;color:#444;">
+    <div>
+      <p style="font-weight:700;color:#1a1a1a;margin-bottom:6px;">&#128202; Dynatrace Report — Required columns:</p>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tr style="background:#fff8e1;"><th style="padding:4px 8px;text-align:left;border:1px solid #e0c060;">Column Name</th><th style="padding:4px 8px;text-align:left;border:1px solid #e0c060;">Description</th></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">servername</td><td style="padding:4px 8px;border:1px solid #eee;">Full or short server hostname</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">host availability %</td><td style="padding:4px 8px;border:1px solid #eee;">Availability as a % value (e.g. 99.97)</td></tr>
+      </table>
+      <p style="margin-top:8px;color:#856404;font-size:11px;">&#9888; Hostname trimming: the tool auto-strips at the <strong>first occurrence</strong> of <code>.</code> <code>(</code> or <code>[</code> — whichever appears earliest — then lowercases the result.</p>
+      <div style="margin-top:10px;padding:8px 10px;background:#fff0f8;border:1px solid #f9c;border-radius:4px;font-size:11px;">
+        <strong style="color:#d63384;">&#128259; Duplicate Handling:</strong><br>
+        When the same short hostname appears more than once in DT, all entries are <strong>grouped together</strong> with a pink border. The entry with the <strong>highest availability</strong> keeps its normal category. All others are flagged <strong>"Duplicate - Check Manually"</strong>.
+      </div>
+      <div style="margin-top:8px;padding:8px 10px;background:#e8f4fd;border:1px solid #7ec8e3;border-radius:4px;font-size:11px;">
+        <strong style="color:#006064;">&#129302; Ansible Manual Check CSV:</strong><br>
+        Upload the <code>ansible_check_combined.csv</code> — columns: <code>hostname, reported_by_command, status</code>.<br>
+        Servers with a result → category updated automatically.<br>
+        Servers <strong>not found</strong> in the CSV → remain <strong>"Check Manually"</strong>.
+      </div>
+      <div style="margin-top:8px;padding:8px 10px;background:#f0fff4;border:1px solid #28a745;border-radius:4px;font-size:11px;">
+        <strong style="color:#155724;">&#9986; Smart Hostname Trimmer:</strong><br>
+        After uploading DT, use the <strong>Trim &amp; Download</strong> tool to strip server names at the first <code>.</code>, <code>(</code>, or <code>[</code> — whichever comes first. Download the trimmed list to fetch matching CMDB data. The same trim logic applies automatically to CMDB names during matching.
+      </div>
+    </div>
+    <div>
+      <p style="font-weight:700;color:#1a1a1a;margin-bottom:6px;">&#128450; CMDB Server List — Required &amp; optional columns:</p>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tr style="background:#fff8e1;"><th style="padding:4px 8px;text-align:left;border:1px solid #e0c060;">Column Name</th><th style="padding:4px 8px;text-align:left;border:1px solid #e0c060;">Used For</th><th style="padding:4px 8px;text-align:left;border:1px solid #e0c060;">Required?</th></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">Name</td><td style="padding:4px 8px;border:1px solid #eee;">Server hostname</td><td style="padding:4px 8px;border:1px solid #eee;color:#c0392b;font-weight:700;">Yes</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">Install Status</td><td style="padding:4px 8px;border:1px solid #eee;">Retired / Installed / Maintenance</td><td style="padding:4px 8px;border:1px solid #eee;color:#c0392b;font-weight:700;">Yes</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">Used for</td><td style="padding:4px 8px;border:1px solid #eee;">Production / DR / Non-Prod SLA logic</td><td style="padding:4px 8px;border:1px solid #eee;color:#c0392b;font-weight:700;">Yes</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">Technical Support Group</td><td style="padding:4px 8px;border:1px solid #eee;">HC managed group check</td><td style="padding:4px 8px;border:1px solid #eee;color:#c0392b;font-weight:700;">Yes</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">Created / Retired Date / Owned by</td><td style="padding:4px 8px;border:1px solid #eee;">Dates &amp; owner filter</td><td style="padding:4px 8px;border:1px solid #eee;color:#e67700;">Recommended</td></tr>
+      </table>
+      <div style="margin-top:8px;padding:6px 10px;background:#fff8e1;border-radius:4px;border:1px solid #f0c040;font-size:11px;">
+        <p style="color:#856404;">&#9888; DT &amp; CMDB hostnames are both trimmed at the first <code>.</code>, <code>(</code>, or <code>[</code> (whichever comes first), then lowercased for matching. E.g. <code>slb28889.srv.allianz</code> &rarr; <code>slb28889</code>.</p><br>
+        <strong>HC Managed TSG groups (case-insensitive):</strong><br>
+        A.TEC.GLOB.HC.APAC.LINUX &nbsp;|&nbsp; A.TEC.GLOB.HC.LINUX &nbsp;|&nbsp; AZTEC.AU.LINUX &nbsp;|&nbsp; A.TEC.GLOB.ITSM.HMO.OS-LINUX
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding:10px 14px;background:#fff;border-radius:6px;border:1px solid #e0c060;font-size:12px;">
+    <p style="font-weight:700;margin-bottom:6px;color:#1a1a1a;">&#128269; Review Tab — Filter dropdown explained:</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+      <div><span style="font-family:monospace;background:#f0f0f0;padding:1px 6px;border-radius:4px;">-- Uncategorized rows --</span><br>Rows not yet assigned any category</div>
+      <div><span style="font-family:monospace;background:#f0f0f0;padding:1px 6px;border-radius:4px;">-- Check Manually rows --</span><br>Rows flagged for manual investigation</div>
+      <div><span style="font-family:monospace;background:#f0f0f0;padding:1px 6px;border-radius:4px;">-- SLA OK rows --</span><br>Servers within availability SLA</div>
+      <div><span style="font-family:monospace;background:#f0f0f0;padding:1px 6px;border-radius:4px;">-- Duplicate rows --</span><br>All rows that share a short hostname</div>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('upload')">1. Upload Files</button>
+  <button class="tab" onclick="showTab('review')">2. Review &amp; Categorize</button>
+  <button class="tab" onclick="showTab('summary')">3. Summary &amp; Export</button>
+  <button class="tab" onclick="showTab('psguide')">&#9654; PowerShell Guide</button>
+  <button class="tab" onclick="showTab('ansibleguide')">&#9654; Ansible Guide</button>
+  <button class="tab" onclick="showTab('workflow')">&#128200; Workflow</button>
+</div>
+
+<!-- TAB 1: UPLOAD -->
+<div id="sec-upload" class="sec on">
+  <div class="notebox">
+    <strong>Workflow:</strong> (1) Upload Dynatrace report &nbsp;|&nbsp;
+    (2) [Optional] Trim &amp; Download hostnames for CMDB fetch &nbsp;|&nbsp;
+    (3) Upload CMDB list &nbsp;|&nbsp;
+    (4) Optionally upload Ping CSV &amp; Ansible CSV &nbsp;|&nbsp;
+    (5) Set thresholds &amp; Click Process.
+  </div>
+  <div class="g4">
+    <div>
+      <p style="font-weight:700;margin-bottom:4px;">&#128202; Dynatrace Report <span style="color:red">*</span></p>
+      <p style="font-size:11px;color:#888;margin-bottom:6px;">server name + host availability % columns</p>
+      <div class="ubox" onclick="document.getElementById('dt-file').click()">
+        <div style="font-size:22px;margin-bottom:4px;">&#128202;</div>
+        <strong>Click to upload</strong>
+        <div style="font-size:11px;color:#888;">.xlsx / .xls / .csv</div>
+        <div id="dt-st" style="margin-top:6px;"></div>
+        <input type="file" id="dt-file" accept=".xlsx,.xls,.csv" onchange="loadFile(event,'dt')" onclick="this.value=null;">
+      </div>
+      <div id="dt-map" class="cmap" style="display:none;">
+        Server col: <select class="smsel" id="map-name" onchange="updateTrimPreview()"></select>
+        &nbsp;Avail col: <select class="smsel" id="map-avail"></select>
+      </div>
+      <!-- TRIM TOOL — no delimiter picker, combined auto-trim -->
+      <div id="trim-tool" class="trim-box" style="display:none;">
+        <h4>&#9986; Hostname Trimmer — for CMDB Fetch</h4>
+        <div style="background:#e8f4fd;border:1px solid #7ec8e3;border-radius:4px;padding:6px 10px;margin-bottom:8px;font-size:11px;color:#006064;">
+          &#128161; Strips at the <strong>first occurrence</strong> of <code>.</code>, <code>(</code>, or <code>[</code> — whichever appears earliest in the name. Same logic is applied automatically to CMDB names during matching.
+        </div>
+        <div class="trim-row">
+          <label style="font-size:12px;color:#555;white-space:nowrap;">Preview (first sample):</label>
+          <span class="trim-preview" id="trim-preview">—</span>
+        </div>
+        <div class="trim-row">
+          <button class="btngrn" onclick="downloadTrimmedHostnames()">&#11015; Download Trimmed Hostnames (.txt)</button>
+          <span style="font-size:11px;color:#777;">Use this file to filter &amp; fetch matching CMDB records</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p style="font-weight:700;margin-bottom:4px;">&#128450; CMDB Server List <span style="color:#888;font-weight:400;">(optional)</span></p>
+      <p style="font-size:11px;color:#888;margin-bottom:6px;">hostname, Install Status, Used for, TSG, Created, Retired Date, Owned By</p>
+      <div class="ubox" onclick="document.getElementById('cmdb-file').click()">
+        <div style="font-size:22px;margin-bottom:4px;">&#128450;</div>
+        <strong>Click to upload</strong>
+        <div style="font-size:11px;color:#888;">.xlsx / .xls / .csv</div>
+        <div id="cmdb-st" style="margin-top:6px;"></div>
+        <input type="file" id="cmdb-file" accept=".xlsx,.xls,.csv" onchange="loadFile(event,'cmdb')" onclick="this.value=null;">
+      </div>
+      <div id="cmdb-map" class="cmap" style="display:none;">
+        Host: <select class="smsel" id="map-ch"></select>
+        Status: <select class="smsel" id="map-cs"></select>
+        Used For: <select class="smsel" id="map-uf"></select>
+        TSG: <select class="smsel" id="map-tsg"></select>
+        Created: <select class="smsel" id="map-cc"></select>
+        Retired Date: <select class="smsel" id="map-rd"></select>
+        Owned By: <select class="smsel" id="map-co"></select><br>
+        Retired kw: <input class="sminp" id="kw-ret" value="retired" style="width:75px;">
+        Maint kw: <input class="sminp" id="kw-mnt" value="maintenance" style="width:85px;">
+        Prod value: <input class="sminp" id="kw-prod" value="Production" style="width:90px;">
+        DR value: <input class="sminp" id="kw-dr" value="Disaster Recovery" style="width:120px;"><br>
+        <div style="margin-top:6px;padding:5px 8px;background:#e8f4fd;border:1px solid #7ec8e3;border-radius:4px;font-size:11px;color:#006064;width:100%;">
+          &#9986; CMDB names are automatically trimmed at the first <code>.</code>, <code>(</code>, or <code>[</code> during matching — no configuration needed.
+        </div>
+      </div>
+    </div>
+    <div>
+      <p style="font-weight:700;margin-bottom:4px;">&#128246; Ping Results CSV <span style="color:#888;font-weight:400;">(optional)</span></p>
+      <p style="font-size:11px;color:#888;margin-bottom:6px;">Generated by the PowerShell script (see guide tab)</p>
+      <div class="ubox" onclick="document.getElementById('ping-file').click()">
+        <div style="font-size:22px;margin-bottom:4px;">&#128246;</div>
+        <strong>Click to upload</strong>
+        <div style="font-size:11px;color:#888;">ping_results.csv only</div>
+        <div id="ping-st" style="margin-top:6px;"></div>
+        <input type="file" id="ping-file" accept=".csv" onchange="loadFile(event,'ping')" onclick="this.value=null;">
+      </div>
+      <div id="ping-map" class="cmap" style="display:none;">
+        Host: <select class="smsel" id="map-ph"></select>
+        Status: <select class="smsel" id="map-ps"></select>
+      </div>
+    </div>
+    <div>
+      <p style="font-weight:700;margin-bottom:4px;">&#129302; Ansible Check CSV <span style="color:#888;font-weight:400;">(optional)</span></p>
+      <p style="font-size:11px;color:#888;margin-bottom:6px;">From Ansible playbook — updates "Check Manually" servers</p>
+      <div class="ubox" onclick="document.getElementById('ansible-file').click()">
+        <div style="font-size:22px;margin-bottom:4px;">&#129302;</div>
+        <strong>Click to upload</strong>
+        <div style="font-size:11px;color:#888;">ansible_check_combined.csv</div>
+        <div id="ansible-st" style="margin-top:6px;"></div>
+        <input type="file" id="ansible-file" accept=".csv" onchange="loadFile(event,'ansible')" onclick="this.value=null;">
+      </div>
+      <div id="ansible-map" class="cmap" style="display:none;">
+        Host col: <select class="smsel" id="map-ah"></select>
+        Status col: <select class="smsel" id="map-as"></select>
+      </div>
+    </div>
+  </div>
+
+  <!-- THRESHOLD SETTINGS -->
+  <div class="tbox">
+    <p style="font-weight:700;font-size:13px;color:#3b5bdb;margin-bottom:10px;">&#9881; Availability Threshold Settings <span style="font-size:11px;color:#888;font-weight:400;">(editable — defaults pre-filled)</span></p>
+    <div class="tgrid">
+      <div class="tcard">
+        <div class="tcard-title">&#127381; Production Servers</div>
+        <div class="trow"><label>Available in SLA if availability &ge;</label><input type="number" id="prod-sla" value="99.95" step="0.01" min="0" max="100"> %</div>
+        <div class="trow"><label>Patching Reboot if between</label><input type="number" id="prod-patch-lo" value="90" step="0.01" min="0" max="100"> % and SLA threshold</div>
+        <div class="trow"><label>Below patching threshold &rarr;</label><select id="prod-low-cat"><option>Check Manually</option><option>Customer Powered Off</option><option>Other</option></select></div>
+      </div>
+      <div class="tcard">
+        <div class="tcard-title">&#128187; Non-Production Servers</div>
+        <div class="trow"><label>Available in SLA if availability &ge;</label><input type="number" id="nonp-sla" value="95" step="0.01" min="0" max="100"> %</div>
+        <div class="trow"><label>Patching Reboot if between</label><input type="number" id="nonp-patch-lo" value="90" step="0.01" min="0" max="100"> % and SLA threshold</div>
+        <div class="trow"><label>Below patching threshold &rarr;</label><select id="nonp-low-cat"><option>Check Manually</option><option>Customer Powered Off</option><option>Other</option></select></div>
+      </div>
+      <div class="tcard" style="border:1px solid #b8d0ff;">
+        <div class="tcard-title" style="color:#1a56a0;">&#9874; Disaster Recovery Servers</div>
+        <div style="font-size:12px;color:#555;line-height:1.6;">DR servers follow Non-Production SLA (95%).<br><br>
+        If availability &ge; 95% &rarr; <span style="background:#d4edda;color:#155724;padding:1px 8px;border-radius:999px;font-weight:700;">Available in SLA</span><br>
+        If availability &lt; 95% &rarr; <span style="background:#e8f0fe;color:#1a56a0;padding:1px 8px;border-radius:999px;font-weight:700;">DR Server / In Maintenance</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIC CARDS -->
+  <div class="rbox">
+    <p style="font-weight:700;font-size:13px;margin-bottom:10px;">Auto-categorization logic (applied in this order)</p>
+    <div class="rcards">
+      <div class="rc" style="background:#ffe0f0;border:1px solid #f9c;"><strong>0. Duplicate short name</strong><span>&rarr; Highest avail entry keeps normal category. All others &rarr; Duplicate - Check Manually.</span></div>
+      <div class="rc" style="background:#fde8e8;border:1px solid #f5c0c0;"><strong>1. TSG not in HC managed groups</strong><span>&rarr; HC Linux not managed</span></div>
+      <div class="rc" style="background:#d4edda;"><strong>2. Availability &ge; SLA threshold</strong><span>&rarr; Available in SLA Threshold limit</span></div>
+      <div class="rc" style="background:#ede9ff;"><strong>3. CMDB Install Status = Retired</strong><span>&rarr; Retired / Decommission</span></div>
+      <div class="rc" style="background:#e8f0fe;border:1px solid #b8d0ff;"><strong>4. Used For = Disaster Recovery</strong><span>&rarr; DR Server / In Maintenance</span></div>
+      <div class="rc" style="background:#fde8e8;"><strong>5. CMDB Install Status = Maintenance</strong><span>&rarr; Customer Powered Off</span></div>
+      <div class="rc" style="background:#d4f5e9;"><strong>6. CMDB Created within last month</strong><span>&rarr; Newly Built Server</span></div>
+      <div class="rc" style="background:#fff8dc;"><strong>7. Availability &ge; Patching threshold (90%)</strong><span>&rarr; Patching Reboot or Check Manually</span></div>
+      <div class="rc" style="background:#e8f4fd;border:1px solid #7ec8e3;"><strong>8. Ansible Check CSV uploaded</strong><span>&rarr; Overrides "Check Manually" with Ansible result</span></div>
+    </div>
+  </div>
+
+  <button class="btnp" id="proc-btn" onclick="startProcess()">Process &amp; Auto-categorize &rarr;</button>
+  <div class="pbox">
+    <div class="pbar-wrap">
+      <div class="pbar-track"><div class="pbar-fill" id="pbar"></div></div>
+      <span class="pbar-lbl" id="plbl">Ready</span>
+    </div>
+    <p class="pbar-status" id="pstat">Upload files above then click the button to start.</p>
+  </div>
+</div>
+
+<!-- TAB 2: REVIEW -->
+<div id="sec-review" class="sec">
+  <div id="rev-ban"></div>
+  <div class="bulk">
+    <strong>Bulk assign <span id="sel-cnt" style="color:#3b5bdb;">(0 selected)</span>:</strong>
+    <select class="smsel" id="bulk-cat" style="min-width:220px;">
+      <option value="">&#8212; pick category &#8212;</option>
+      <option>Available in SLA Threshold limit</option>
+      <option>Newly Built Server</option>
+      <option>Retired/Decommission</option>
+      <option>DR Server / In Maintenance</option>
+      <option>Customer Powered Off</option>
+      <option>Patching Reboot</option>
+      <option>Scheduled reboot by customer</option>
+      <option>Check Manually</option>
+      <option>Duplicate - Check Manually</option>
+      <option>CMDB Data Not Found / Failed Server Build</option>
+      <option>HC Linux not managed</option>
+      <option>Other</option>
+    </select>
+    <input class="smsel" id="bulk-note" placeholder="Note (optional)" style="width:170px;">
+    <button class="btnp" onclick="applyBulk()">Apply to selected</button>
+    <button class="btnsm" onclick="selAllVis()">Select all visible</button>
+    <button class="btnsm" onclick="deselAll()">Deselect all</button>
+  </div>
+  <div class="toolbar">
+    <input type="text" id="ft" placeholder="Filter by name, category, owner, TSG..." style="width:240px;" oninput="renderTable()">
+    <select id="fc" onchange="renderTable()">
+      <option value="">All categories</option>
+      <option value="__blank__">-- Uncategorized rows --</option>
+      <option value="__manual__">-- Check Manually rows --</option>
+      <option value="__sla__">-- SLA OK rows --</option>
+      <option value="__nocmdb__">-- CMDB Not Found rows --</option>
+      <option value="__dr__">-- DR Server rows --</option>
+      <option value="__hcnm__">-- HC Linux not managed --</option>
+      <option value="__dup__">-- Duplicate rows --</option>
+      <option disabled>─────────────────</option>
+      <option>Available in SLA Threshold limit</option>
+      <option>Newly Built Server</option>
+      <option>Retired/Decommission</option>
+      <option>DR Server / In Maintenance</option>
+      <option>Customer Powered Off</option>
+      <option>Patching Reboot</option>
+      <option>Scheduled reboot by customer</option>
+      <option>Check Manually</option>
+      <option>Duplicate - Check Manually</option>
+      <option>CMDB Data Not Found / Failed Server Build</option>
+      <option>HC Linux not managed</option>
+      <option>Other</option>
+    </select>
+    <select id="fo" onchange="renderTable()"><option value="">All owners</option></select>
+    <select id="fenv" onchange="renderTable()">
+      <option value="">All environments</option>
+      <option value="prod">Production only</option>
+      <option value="nonp">Non-Production only</option>
+      <option value="dr">Disaster Recovery only</option>
+    </select>
+    <button class="btngrn" id="dl-hosts-btn" style="display:none;" onclick="downloadCheckManualHosts()">&#11015; Download Hostnames for Ansible</button>
+  </div>
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="chk-all" onchange="toggleAll(this.checked)"></th>
+          <th>Trimmed Name</th>
+          <th>Original Name</th>
+          <th>Avail %</th>
+          <th>Env</th>
+          <th>CMDB Install Status</th>
+          <th>Owned By</th>
+          <th>Technical Support Group</th>
+          <th>Ping</th>
+          <th>Ansible Check</th>
+          <th>Category</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="tbl"></tbody>
+    </table>
+  </div>
+  <div id="pgn"></div>
+  <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
+    <button class="btnp" onclick="exportXLSX()">&#11015; Export Excel (.xlsx)</button>
+    <button class="btns" onclick="showTab('summary')">View Summary &rarr;</button>
+  </div>
+</div>
+
+<!-- TAB 3: SUMMARY -->
+<div id="sec-summary" class="sec"><div id="sum-body"></div></div>
+
+<!-- TAB 4: POWERSHELL -->
+<div id="sec-psguide" class="sec">
+  <div class="notebox">
+    <strong>How it works:</strong> Run the script below from any Windows machine that can reach your servers.
+    It reads your Dynatrace CSV, pings each server, and saves <code>ping_results.csv</code> — upload it in the Upload tab.
+  </div>
+  <p style="font-weight:700;margin-bottom:8px;">Save as <code>ping_servers.ps1</code> and run as Administrator</p>
+  <div class="nfb"><span class="cm"># ping_servers.ps1 — reads DT CSV, pings each server, outputs ping_results.csv</span>
+<span class="kw">param</span>(
+  [string]<span class="str">$In</span>      = <span class="str">"dt_servers.csv"</span>,
+  [string]<span class="str">$Out</span>     = <span class="str">"ping_results.csv"</span>,
+  [int]   <span class="str">$Timeout</span> = 1000
+)
+<span class="str">$data</span> = Import-Csv <span class="str">$In</span>
+<span class="str">$col</span>  = (<span class="str">$data</span>[0].PSObject.Properties.Name) |
+         Where-Object { <span class="str">$_</span> -match <span class="str">'server|host|name'</span> } |
+         Select-Object -First 1
+<span class="str">$res</span> = @()
+<span class="str">$i</span>   = 0
+<span class="kw">foreach</span> (<span class="str">$r</span> <span class="kw">in</span> <span class="str">$data</span>) {
+    <span class="str">$i</span>++
+    <span class="str">$h</span> = (<span class="str">$r</span>.<span class="str">$col</span> -split <span class="str">'[.\s]'</span>)[0].ToLower().Trim()
+    Write-Progress -Activity <span class="str">"Pinging"</span> -Status <span class="str">"$i / $($data.Count) : $h"</span> -PercentComplete (<span class="str">$i</span> / <span class="str">$data</span>.Count * 100)
+    <span class="str">$st</span> = <span class="str">"Unreachable"</span>; <span class="str">$ms</span> = <span class="str">""</span>
+    <span class="kw">try</span> {
+        <span class="str">$ping</span>  = New-Object System.Net.NetworkInformation.Ping
+        <span class="str">$reply</span> = <span class="str">$ping</span>.Send(<span class="str">$h</span>, <span class="str">$Timeout</span>)
+        <span class="kw">if</span> (<span class="str">$reply</span>.Status -eq <span class="str">"Success"</span>) { <span class="str">$st</span> = <span class="str">"Reachable"</span>; <span class="str">$ms</span> = <span class="str">$reply</span>.RoundtripTime }
+    } <span class="kw">catch</span> { <span class="str">$st</span> = <span class="str">"Error"</span> }
+    <span class="str">$res</span> += [PSCustomObject]@{
+        ShortServerName = <span class="str">$h</span>; OriginalName = <span class="str">$r</span>.<span class="str">$col</span>
+        PingStatus = <span class="str">$st</span>; LatencyMs = <span class="str">$ms</span>
+        CheckedAt = (Get-Date -Format <span class="str">"yyyy-MM-dd HH:mm"</span>)
+    }
+}
+<span class="str">$res</span> | Export-Csv <span class="str">$Out</span> -NoTypeInformation -Encoding UTF8
+Write-Host <span class="str">"Done: $Out"</span> -ForegroundColor Green</div>
+  <p style="font-size:12px;color:#555;">First run: <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code><br>Then: <code>.\ping_servers.ps1</code></p>
+</div>
+
+<!-- TAB 5: ANSIBLE GUIDE -->
+<div id="sec-ansibleguide" class="sec">
+  <div class="notebox">
+    <strong>How it works:</strong> Run the playbook from your <strong>jump server</strong> using a privileged user with <code>become: yes / become_user: root</code>.
+    Supply the server list via <code>-i inventory.ini</code>. The playbook checks boot logs, writes per-server CSVs,
+    combines them into <code>ansible_check_combined.csv</code>, and emails it using the system <code>mail</code> command.
+  </div>
+  <p style="font-weight:700;margin-bottom:6px;font-size:13px;">&#128196; Step 1 — Download hostnames &amp; build inventory</p>
+  <div style="background:#f7f7f7;border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;">
+    Go to <strong>Review &amp; Categorize</strong> tab → filter by <em>"-- Check Manually rows --"</em> → click <span style="background:#198754;color:#fff;padding:1px 8px;border-radius:4px;font-size:11px;font-weight:700;">&#11015; Download Hostnames for Ansible</span> to get <code>check_manually_hosts.txt</code>.
+  </div>
+  <p style="font-weight:700;margin-bottom:4px;font-size:13px;">&#128196; Step 2 — inventory.ini</p>
+  <div class="nfb"><span class="cm"># inventory.ini</span>
+[all]
+server01.yourdomain.com
+server02.yourdomain.com</div>
+  <p style="font-weight:700;margin-bottom:4px;font-size:13px;">&#128196; Step 3 — Ansible Playbook (<code>check_servers.yml</code>)</p>
+  <div class="nfb"><span class="cm">---
+# check_servers.yml
+# Run from jump server:
+#   ansible-playbook check_servers.yml -i inventory.ini -u jumpuser --become --become-user root
+#
+# Logic (OR condition — either is enough for "Scheduled reboot by customer"):
+#   CHECK 1: last | grep boot | cut -f 8-11 -d ' '
+#            → count non-empty output lines
+#            → > 1 line  => Scheduled reboot by customer
+#            → 0 or 1 line => Customer Powered Off  (unless check 2 fires)
+#   CHECK 2: cat /var/log/messages | grep 'Stopped Record...'
+#            → any output => Scheduled reboot by customer
+#
+# If EITHER fires => "Scheduled reboot by customer"
+# If NEITHER fires => "Customer Powered Off"
+# CSV columns: hostname,reported_by_command,status</span>
+
+- name: Check Manually — Server Boot Status Investigation
+  hosts: all
+  gather_facts: no
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  vars:
+    report_dir: "/tmp/ansible_reports"
+    email_to: "senthil-kumar.giritharan@allianz.com"
+
+  tasks:
+
+    - name: Remove old per-server CSV reports from previous runs
+      delegate_to: localhost
+      run_once: yes
+      shell: "rm -f {{ report_dir }}/*_check.csv {{ report_dir }}/ansible_check_combined.csv 2>/dev/null || true"
+      changed_when: false
+
+    - name: Create report directory on jump server
+      delegate_to: localhost
+      run_once: yes
+      file:
+        path: "{{ report_dir }}"
+        state: directory
+        mode: '0755'
+
+    <span class="cm"># ── CHECK 1: count boot lines from last ──────────────────────────────</span>
+    - name: Count boot entries from last command
+      shell: |
+        COUNT=$(last 2>/dev/null | grep -i boot | cut -f8-11 -d' ' | grep -c . || echo 0)
+        echo $COUNT
+      register: boot_count_raw
+      ignore_errors: yes
+      changed_when: false
+
+    <span class="cm"># ── CHECK 2: UTMP log check ───────────────────────────────────────────</span>
+    - name: Count UTMP boot/shutdown entries in messages log
+      shell: |
+        COUNT=$(cat /var/log/messages 2>/dev/null | grep -c 'Stopped Record System Boot/Shutdown in UTMP' || echo 0)
+        echo $COUNT
+      register: utmp_count_raw
+      ignore_errors: yes
+      changed_when: false
+
+    <span class="cm"># ── Determine final counts safely ────────────────────────────────────</span>
+    - name: Parse counts and set status
+      set_fact:
+        boot_count: "{{ boot_count_raw.stdout | default('0') | trim | int }}"
+        utmp_count: "{{ utmp_count_raw.stdout | default('0') | trim | int }}"
+
+    - name: Set host_status
+      set_fact:
+        host_status: "{{ 'Scheduled reboot by customer' if (boot_count | int > 1 or utmp_count | int > 0) else 'Customer Powered Off' }}"
+
+    - name: Set reported_by_command
+      set_fact:
+        reported_by_command: >-
+          {%- if boot_count | int > 1 and utmp_count | int > 0 -%}
+            last|grep boot|cut -f8-11 -d' ' ({{ boot_count }} lines) AND /var/log/messages UTMP check ({{ utmp_count }} entries)
+          {%- elif boot_count | int > 1 -%}
+            last|grep boot|cut -f8-11 -d' ' ({{ boot_count }} lines found)
+          {%- elif utmp_count | int > 0 -%}
+            cat /var/log/messages|grep 'Stopped Record System Boot/Shutdown in UTMP' ({{ utmp_count }} entries)
+          {%- else -%}
+            last|grep boot|cut -f8-11 -d' ' returned {{ boot_count }} line(s) - Customer Powered Off
+          {%- endif -%}
+
+    <span class="cm"># ── Write per-server result CSV on jump server ────────────────────────</span>
+    - name: Write per-server CSV
+      delegate_to: localhost
+      copy:
+        content: "hostname,reported_by_command,status\n{{ inventory_hostname }},\"{{ reported_by_command }}\",\"{{ host_status }}\"\n"
+        dest: "{{ report_dir }}/{{ inventory_hostname }}_check.csv"
+
+    - name: Debug result (visible in ansible output)
+      debug:
+        msg: "{{ inventory_hostname }} => {{ host_status }} | boot_lines={{ boot_count }} utmp_entries={{ utmp_count }}"
+
+
+<span class="cm"># ── Play 2: Combine CSVs and email ─────────────────────────────────────</span>
+- name: Combine all per-server CSVs and send email
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    report_dir: "/tmp/ansible_reports"
+    combined_csv: "{{ report_dir }}/ansible_check_combined.csv"
+    email_to: "senthil-kumar.giritharan@allianz.com"
+
+  tasks:
+
+    - name: Write combined CSV header
+      copy:
+        content: "hostname,reported_by_command,status\n"
+        dest: "{{ combined_csv }}"
+
+    - name: Append each per-server CSV (skip header line)
+      shell: "tail -n +2 {{ item }} >> {{ combined_csv }}"
+      with_fileglob:
+        - "{{ report_dir }}/*_check.csv"
+
+    - name: Verify combined CSV content
+      shell: "cat {{ combined_csv }}"
+      register: combined_content
+      changed_when: false
+
+    - name: Show combined CSV content
+      debug:
+        msg: "{{ combined_content.stdout_lines }}"
+
+    - name: Send combined CSV by email using shell mail command
+      shell: >
+        echo "Ansible server check report attached.
+        Boot status check completed. Upload ansible_check_combined.csv to the Host Availability Report Builder." |
+        mail -s "[HC Linux] Ansible Check Manually Report - $(date +%Y-%m-%d)"
+        -a "{{ combined_csv }}"
+        "{{ email_to }}"
+      ignore_errors: yes
+
+    - name: Print report location
+      debug:
+        msg: "Combined report saved at: {{ combined_csv }} — upload this file to the Report Builder."
+
+
+# ── Play 2: Combine CSVs and email ─────────────────────────────────────
+- name: Combine all per-server CSVs and send email
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    report_dir: "/tmp/ansible_reports"
+    combined_csv: "{{ report_dir }}/ansible_check_combined.csv"
+    email_to: "senthil-kumar.giritharan@allianz.com"
+
+  tasks:
+
+    - name: Write combined CSV header
+      copy:
+        content: "hostname,reported_by_command,status\n"
+        dest: "{{ combined_csv }}"
+
+    - name: Append each per-server CSV (skip header)
+      shell: "tail -n +2 {{ item }} >> {{ combined_csv }}"
+      with_fileglob:
+        - "{{ report_dir }}/*_check.csv"
+
+    - name: Send combined CSV by email using shell mail command
+      shell: >
+        echo "Please find the attached Ansible server check report.
+        Upload ansible_check_combined.csv to the Host Availability Report Builder." |
+        mail -s "[HC Linux] Ansible Check Manually Report - $(date +%Y-%m-%d)"
+        -a "{{ combined_csv }}"
+        "{{ email_to }}"
+      ignore_errors: yes
+
+    - name: Print report location
+      debug:
+        msg: "Combined report: {{ combined_csv }} — upload this to the Report Builder."</div>
+  <div style="padding:10px 14px;background:#fff8e1;border:1px solid #f0c040;border-radius:6px;font-size:12px;margin-top:4px;">
+    <strong>&#9888; Run:</strong> <code>ansible-playbook check_servers.yml -i inventory.ini -u YOUR_USER --become --become-user root</code>
+  </div>
+</div>
+
+<!-- TAB 6: WORKFLOW -->
+<div id="sec-workflow" class="sec">
+  <div class="wf-wrap">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:6px;">
+      <div>
+        <div class="wf-title">&#128200; How the Report Builder Works — Full Workflow</div>
+        <div class="wf-sub">A step-by-step guide you can share with your team or present to stakeholders</div>
+      </div>
+      <button class="dl-wf-btn" onclick="downloadWorkflowPDF()">&#11015; Download Workflow as HTML</button>
+    </div>
+    <div style="background:#e8f0fe;border-left:4px solid #3b5bdb;border-radius:6px;padding:8px 14px;margin-bottom:14px;font-size:12px;font-weight:700;color:#3b5bdb;letter-spacing:.05em;">PHASE 1 — DATA COLLECTION</div>
+    <div class="wf-step">
+      <div class="wf-num" style="background:#fff3cd;color:#856404;">1</div>
+      <div class="wf-body">
+        <strong>&#128202; Export Dynatrace (DT) Report <span class="wf-tag wf-required">Required</span></strong>
+        <p>Export a CSV/Excel with two columns: <code>servername</code> and <code>host availability %</code>.</p>
+      </div>
+    </div>
+    <div class="wf-arrow">&#8595;</div>
+    <div class="wf-step">
+      <div class="wf-num" style="background:#f0fff4;color:#155724;">2</div>
+      <div class="wf-body">
+        <strong>&#9986; Trim Hostnames &amp; Download for CMDB Fetch <span class="wf-tag wf-optional">Optional but Recommended</span></strong>
+        <p>Upload the DT file → use the <strong>Hostname Trimmer</strong> to strip at the first <code>.</code>, <code>(</code>, or <code>[</code> — whichever comes first. Download the trimmed list as <code>.txt</code> to filter &amp; export from your CMDB. The same trim is applied automatically to CMDB names during matching.</p>
+      </div>
+    </div>
+    <div class="wf-arrow">&#8595;</div>
+    <div class="wf-step">
+      <div class="wf-num" style="background:#f7f7f7;color:#555;">3</div>
+      <div class="wf-body">
+        <strong>&#128450; Export &amp; Upload CMDB Data <span class="wf-tag wf-optional">Optional</span></strong>
+        <p>Using the trimmed hostname list, filter your CMDB and export: <code>Name, Install Status, Used for, Technical Support Group, Created, Retired Date, Owned by</code>.</p>
+      </div>
+    </div>
+    <hr class="wf-divider">
+    <div style="background:#f0fff4;border-left:4px solid #28a745;border-radius:6px;padding:8px 14px;margin-bottom:14px;font-size:12px;font-weight:700;color:#155724;letter-spacing:.05em;">PHASE 2 — EXPORT</div>
+    <div class="wf-step">
+      <div class="wf-num" style="background:#198754;color:#fff;">4</div>
+      <div class="wf-body">
+        <strong>&#11015; Export Excel Report</strong>
+        <p>The exported file includes a <strong>Trimmed Name</strong> column alongside the original name, plus a Summary sheet with category counts.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="author-footer">
+  <span>
+    <span class="af-label">Allianz Technologies</span> &nbsp;-&nbsp;
+    Customer Success – Linux &amp; AIX | Hybrid Cloud Enablement &nbsp;|&nbsp;
+    &#128736;<span class="af-label"> Developed by:</span> Senthil Kumar Giritharan &nbsp;|&nbsp;
+    <span class="af-label">Powered by:</span> Claude
+  </span>
+</div>
+
+<script>
+var HC_MANAGED_TSG=["A.TEC.GLOB.HC.APAC.LINUX","A.TEC.GLOB.HC.LINUX","AZTEC.AU.LINUX","A.TEC.GLOB.ITSM.HMO.OS-LINUX"];
+function isHCManagedTSG(tsg){if(!tsg||tsg.trim()==="")return true;var t=tsg.trim().toUpperCase();for(var i=0;i<HC_MANAGED_TSG.length;i++){if(t===HC_MANAGED_TSG[i].toUpperCase())return true;}return false;}
+
+var dtRaw=[],cmdbRaw=[],pingRaw=[],ansibleRaw=[],rows=[],sel={},curPage=1,pgSize=100;
+
+var CATS=["Available in SLA Threshold limit","Newly Built Server","Retired/Decommission","DR Server / In Maintenance","Customer Powered Off","Patching Reboot","Scheduled reboot by customer","Check Manually","Duplicate - Check Manually","CMDB Data Not Found / Failed Server Build","HC Linux not managed","Other"];
+var CCOL={"Available in SLA Threshold limit":"#198754","Newly Built Server":"#20c997","Retired/Decommission":"#7F77DD","DR Server / In Maintenance":"#1a56a0","Customer Powered Off":"#E24B4A","Patching Reboot":"#378ADD","Scheduled reboot by customer":"#1D9E75","Check Manually":"#EF9F27","Duplicate - Check Manually":"#d63384","CMDB Data Not Found / Failed Server Build":"#c0392b","HC Linux not managed":"#7a1010","Other":"#888780","Uncategorized":"#ccc"};
+
+// ── UNIFIED TRIM: strips at first occurrence of . ( [ whichever comes first ──
+function applyTrim(name){
+  var s=String(name||"").trim();
+  var delims=[".","(","["];
+  var earliest=-1;
+  for(var i=0;i<delims.length;i++){
+    var idx=s.indexOf(delims[i]);
+    if(idx>0&&(earliest<0||idx<earliest))earliest=idx;
+  }
+  return(earliest>0?s.substring(0,earliest):s).toLowerCase().trim();
+}
+
+// Legacy alias — both DT and CMDB use same applyTrim
+function trimHost(s){return applyTrim(s);}
+
+function trimStr(s){return String(s||"").replace(/^\s+|\s+$/g,"");}
+function lc(s){return trimStr(s).toLowerCase();}
+function fmtPct(v){var n=parseFloat(v);return isNaN(n)?"N/A":n.toFixed(4)+"%";}
+function avCls(v){var n=parseFloat(v);if(isNaN(n))return"avwn";if(n>=99.95)return"avok";if(n>=5)return"avwn";return"aver";}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+function parseDate(val){if(!val||val==="")return null;var s=trimStr(String(val)),d=new Date(s);if(!isNaN(d.getTime()))return d;var m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);if(m){d=new Date(parseInt(m[3]),parseInt(m[2])-1,parseInt(m[1]));if(!isNaN(d.getTime()))return d;}return null;}
+function formatDate(val){if(!val||val==="")return"";var d=parseDate(val);if(!d)return trimStr(String(val));return("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2)+"/"+d.getFullYear();}
+
+function updateTrimPreview(){
+  var nCol=document.getElementById("map-name");
+  if(!nCol||!dtRaw.length){document.getElementById("trim-preview").textContent="—";return;}
+  var col=nCol.value,sample="";
+  for(var i=0;i<Math.min(dtRaw.length,5);i++){var v=trimStr(String(dtRaw[i][col]||""));if(v){sample=v;break;}}
+  if(!sample){document.getElementById("trim-preview").textContent="—";return;}
+  var trimmed=applyTrim(sample);
+  document.getElementById("trim-preview").textContent=(sample+" → "+trimmed);
+}
+
+function downloadTrimmedHostnames(){
+  if(!dtRaw.length){alert("Please upload the DT file first.");return;}
+  var nCol=document.getElementById("map-name").value;
+  var seen={},lines=[];
+  dtRaw.forEach(function(r){
+    var raw=trimStr(String(r[nCol]||""));if(!raw)return;
+    var trimmed=applyTrim(raw);
+    if(trimmed&&!seen[trimmed]){seen[trimmed]=true;lines.push(trimmed);}
+  });
+  if(!lines.length){alert("No hostnames found.");return;}
+  var blob=new Blob([lines.join("\n")],{type:"text/plain"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");a.href=url;a.download="trimmed_hostnames_for_cmdb.txt";a.click();
+  URL.revokeObjectURL(url);
+}
+
+function showTab(t){
+  var tabs=["upload","review","summary","psguide","ansibleguide","workflow"];
+  for(var i=0;i<tabs.length;i++){
+    document.getElementById("sec-"+tabs[i]).className="sec"+(tabs[i]===t?" on":"");
+    document.querySelectorAll(".tab")[i].className="tab"+(tabs[i]===t?" active":"");
+  }
+  if(t==="summary")renderSummary();
+  if(t==="review")updateDlBtn();
+}
+function setProg(pct,lbl,stat,color){var bar=document.getElementById("pbar");bar.style.width=pct+"%";bar.style.background=color||"#3b5bdb";document.getElementById("plbl").textContent=lbl;document.getElementById("pstat").textContent=stat;}
+
+function updateDlBtn(){
+  var btn=document.getElementById("dl-hosts-btn");if(!btn)return;
+  var cat=document.getElementById("fc").value;
+  btn.style.display=(cat==="__manual__"||cat==="Check Manually")?"inline-block":"none";
+}
+function downloadCheckManualHosts(){
+  var filtered=rows.filter(function(r){return r.category==="Check Manually";});
+  if(!filtered.length){alert("No 'Check Manually' servers found.");return;}
+  var lines=filtered.map(function(r){return r.rawName||r.shortName;});
+  var blob=new Blob([lines.join("\n")],{type:"text/plain"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");a.href=url;a.download="check_manually_hosts.txt";a.click();
+  URL.revokeObjectURL(url);
+}
+
+function downloadWorkflowPDF(){
+  var el=document.getElementById("sec-workflow");
+  var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Workflow</title></head><body>'+el.innerHTML+'</body></html>';
+  var blob=new Blob([html],{type:"text/html"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");a.href=url;a.download="HostAvailability_Workflow.html";a.click();
+  URL.revokeObjectURL(url);
+}
+
+function loadFile(e,type){
+  var file=e.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      var wb=XLSX.read(ev.target.result,{type:"array"});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      var data=XLSX.utils.sheet_to_json(ws,{defval:"",raw:false});
+      if(!data.length){alert("No data found in file.");return;}
+      var cols=Object.keys(data[0]);
+      if(type==="dt"){
+        dtRaw=data;
+        document.getElementById("dt-st").innerHTML="<span class='badge b-ok'>"+data.length+" rows loaded</span>";
+        popSel("map-name",cols,function(c){var l=lc(c);return l==="servername"||l==="server name"||l.indexOf("server")>=0;});
+        popSel("map-avail",cols,function(c){var l=lc(c);return l==="host availability %"||l.indexOf("avail")>=0||(l.indexOf("%")>=0&&l.indexOf("host")>=0);});
+        document.getElementById("dt-map").style.display="flex";
+        document.getElementById("trim-tool").style.display="block";
+        setTimeout(updateTrimPreview,100);
+      }else if(type==="cmdb"){
+        cmdbRaw=data;
+        document.getElementById("cmdb-st").innerHTML="<span class='badge b-ok'>"+data.length+" rows loaded</span>";
+        popSel("map-ch",cols,function(c){var l=lc(c);return l==="name"||l==="server name"||l.indexOf("host")>=0;});
+        popSel("map-cs",cols,function(c){var l=lc(c);return l==="install status"||l==="installstatus";});
+        popSel("map-uf",cols,function(c){var l=lc(c);return l==="used for"||l==="usedfor"||l==="usage"||l==="environment";});
+        popSel("map-tsg",cols,function(c){var l=lc(c);return l==="technical support group"||l==="technicalsupportgroup"||l.indexOf("tsg")>=0||l.indexOf("support group")>=0;});
+        popSel("map-cc",cols,function(c){return lc(c)==="created";});
+        popSel("map-rd",cols,function(c){var l=lc(c);return l==="retired date"||l==="retireddate"||l==="retirement date"||l==="decommission date";});
+        popSel("map-co",cols,function(c){var l=lc(c);return l==="owned by"||l==="owner";});
+        document.getElementById("cmdb-map").style.display="flex";
+      }else if(type==="ping"){
+        pingRaw=data;
+        document.getElementById("ping-st").innerHTML="<span class='badge b-ok'>"+data.length+" rows loaded</span>";
+        popSel("map-ph",cols,function(c){var l=lc(c);return l==="shortservername"||l.indexOf("short")>=0||l.indexOf("host")>=0;});
+        popSel("map-ps",cols,function(c){var l=lc(c);return l==="pingstatus"||l.indexOf("ping")>=0;});
+        document.getElementById("ping-map").style.display="flex";
+      }else if(type==="ansible"){
+        ansibleRaw=data;
+        document.getElementById("ansible-st").innerHTML="<span class='badge b-ok'>"+data.length+" rows loaded</span>";
+        popSel("map-ah",cols,function(c){var l=lc(c);return l==="hostname"||l.indexOf("host")>=0||l.indexOf("server")>=0;});
+        popSel("map-as",cols,function(c){var l=lc(c);return l==="status"||l.indexOf("status")>=0;});
+        document.getElementById("ansible-map").style.display="flex";
+      }
+    }catch(err){alert("Error reading file: "+err.message);}
+  };
+  reader.onerror=function(){alert("Failed to read file.");};
+  reader.readAsArrayBuffer(file);
+}
+
+function popSel(id,cols,preferFn){
+  var el=document.getElementById(id);if(!el)return;
+  el.innerHTML="";var best=-1;
+  for(var i=0;i<cols.length;i++){
+    var o=document.createElement("option");o.value=cols[i];o.textContent=cols[i];el.appendChild(o);
+    if(best<0&&preferFn(cols[i]))best=i;
+  }
+  if(best>=0)el.selectedIndex=best;
+}
+
+function getColVal(row,colName){
+  if(row[colName]!==undefined)return row[colName];
+  var target=lc(colName),keys=Object.keys(row);
+  for(var i=0;i<keys.length;i++){if(lc(keys[i])===target)return row[keys[i]];}
+  return"";
+}
+
+function buildCmdbMap(){
+  var hc=document.getElementById("map-ch")?document.getElementById("map-ch").value:"";
+  var sc=document.getElementById("map-cs")?document.getElementById("map-cs").value:"";
+  var ufc=document.getElementById("map-uf")?document.getElementById("map-uf").value:"";
+  var tgc=document.getElementById("map-tsg")?document.getElementById("map-tsg").value:"";
+  var cc=document.getElementById("map-cc")?document.getElementById("map-cc").value:"";
+  var rdc=document.getElementById("map-rd")?document.getElementById("map-rd").value:"";
+  var oc=document.getElementById("map-co")?document.getElementById("map-co").value:"";
+  var now=new Date(),ago=new Date(now.getFullYear(),now.getMonth()-1,now.getDate());
+  var map={};
+  for(var i=0;i<cmdbRaw.length;i++){
+    var r=cmdbRaw[i];
+    var rawHost=trimStr(getColVal(r,hc));
+    // Always use unified applyTrim for CMDB names too
+    var k=applyTrim(rawHost);
+    if(!k)continue;
+    var crRaw=getColVal(r,cc),rdRaw=getColVal(r,rdc),crDate=parseDate(crRaw);
+    map[k]={status:lc(getColVal(r,sc)),usedFor:trimStr(getColVal(r,ufc)),tsg:trimStr(getColVal(r,tgc)),owner:trimStr(getColVal(r,oc)),isNew:(crDate!==null&&crDate>=ago),createdFmt:formatDate(crRaw),retiredDateFmt:formatDate(rdRaw)};
+  }
+  return map;
+}
+
+function buildPingMap(){
+  var hc=document.getElementById("map-ph")?document.getElementById("map-ph").value:"";
+  var sc=document.getElementById("map-ps")?document.getElementById("map-ps").value:"";
+  var map={};
+  for(var i=0;i<pingRaw.length;i++){var k=applyTrim(getColVal(pingRaw[i],hc));if(!k)continue;map[k]=lc(getColVal(pingRaw[i],sc));}
+  return map;
+}
+
+function buildAnsibleMap(){
+  var hc=document.getElementById("map-ah")?document.getElementById("map-ah").value:"";
+  var sc=document.getElementById("map-as")?document.getElementById("map-as").value:"";
+  var map={};
+  for(var i=0;i<ansibleRaw.length;i++){
+    var k=applyTrim(getColVal(ansibleRaw[i],hc));if(!k)continue;
+    var st=trimStr(getColVal(ansibleRaw[i],sc));
+    var cmd=trimStr(getColVal(ansibleRaw[i],"reported_by_command")||getColVal(ansibleRaw[i],"reported by command")||"");
+    map[k]={status:st,cmd:cmd};
+  }
+  return map;
+}
+
+function getThresholds(){
+  return{prodSLA:parseFloat(document.getElementById("prod-sla").value)||99.95,prodPatchLo:parseFloat(document.getElementById("prod-patch-lo").value)||90,prodLowCat:document.getElementById("prod-low-cat").value||"Check Manually",nonpSLA:parseFloat(document.getElementById("nonp-sla").value)||95,nonpPatchLo:parseFloat(document.getElementById("nonp-patch-lo").value)||90,nonpLowCat:document.getElementById("nonp-low-cat").value||"Check Manually"};
+}
+
+function autoCategory(sn,availRaw,cmdbMap,pingMap,T,retKw,mntKw,prodKw,drKw){
+  var p=parseFloat(availRaw);
+  var entry=cmdbMap[sn]||null;
+  if(!entry)return"CMDB Data Not Found / Failed Server Build";
+  var st=entry.status||"",isNew=entry.isNew||false;
+  var usedFor=trimStr(entry.usedFor||""),tsg=trimStr(entry.tsg||""),owner=trimStr(entry.owner||"");
+  var isDR=usedFor.toLowerCase().indexOf(drKw.toLowerCase())>=0;
+  var isProd=!isDR&&usedFor.toLowerCase().indexOf(prodKw.toLowerCase())>=0;
+  var ping=pingMap[sn]||"";
+  if(st.indexOf("install")>=0&&(!usedFor||!owner))return"CMDB Data Not Found / Failed Server Build";
+  var slaThresh=isProd?T.prodSLA:T.nonpSLA;
+  var patchLo=isProd?T.prodPatchLo:T.nonpPatchLo;
+  var lowCat=isProd?T.prodLowCat:T.nonpLowCat;
+  if(st&&st.indexOf(retKw)>=0)return"Retired/Decommission";
+  if(tsg&&!isHCManagedTSG(tsg))return"HC Linux not managed";
+  if(!isNaN(p)&&p>=slaThresh)return"Available in SLA Threshold limit";
+  if(isDR)return"DR Server / In Maintenance";
+  if(st&&st.indexOf(mntKw)>=0)return"Customer Powered Off";
+  if(isNew)return"Newly Built Server";
+  if(!st||st==="")return"CMDB Data Not Found / Failed Server Build";
+  if(!isNaN(p)&&p>=patchLo&&p<slaThresh){if(ping&&ping.indexOf("reachable")>=0&&ping.indexOf("unreachable")===-1)return"Check Manually";return"Patching Reboot";}
+  if(!isNaN(p)&&p<patchLo)return lowCat;
+  return"Check Manually";
+}
+
+function applyAnsibleMap(rowList,ansibleMap){
+  var VALID={"scheduled reboot by customer":"Scheduled reboot by customer","customer powered off":"Customer Powered Off"};
+  for(var i=0;i<rowList.length;i++){
+    var r=rowList[i];if(r.category!=="Check Manually")continue;
+    var entry=ansibleMap[r.shortName];if(!entry)continue;
+    var stLc=lc(entry.status),mapped=null;
+    for(var k in VALID){if(stLc.indexOf(k)>=0){mapped=VALID[k];break;}}
+    if(mapped){r.category=mapped;r.ansibleStatus=entry.status;r.ansibleCmd=entry.cmd;r.notes=(r.notes?r.notes+" | ":"")+"Ansible: "+entry.cmd;}
+    else{r.ansibleStatus=entry.status;r.ansibleCmd=entry.cmd;}
+  }
+  return rowList;
+}
+
+function processDuplicates(rowList){
+  var groups={};
+  for(var i=0;i<rowList.length;i++){var sn=rowList[i].shortName;if(!groups[sn])groups[sn]=[];groups[sn].push(i);}
+  for(var sn in groups){
+    var idxs=groups[sn];if(idxs.length<2)continue;
+    var bestIdx=idxs[0];
+    for(var j=1;j<idxs.length;j++){var a=parseFloat(rowList[idxs[j]].availRaw),b=parseFloat(rowList[bestIdx].availRaw);if(!isNaN(a)&&(isNaN(b)||a>b))bestIdx=idxs[j];}
+    var availSummary=idxs.map(function(k){return rowList[k].rawName+" ("+fmtPct(rowList[k].availRaw)+")";}).join(" | ");
+    for(var j=0;j<idxs.length;j++){var r=rowList[idxs[j]];r.dupGroup=sn;r.dupCount=idxs.length;if(idxs[j]!==bestIdx){r.category="Duplicate - Check Manually";r.notes="Dup group: "+availSummary;r.isDupNonBest=true;}else{r.notes="Highest avail in dup group: "+availSummary;r.isDupBest=true;}}
+  }
+  rowList.sort(function(a,b){if(a.dupGroup&&b.dupGroup&&a.dupGroup===b.dupGroup){if(a.isDupBest)return-1;if(b.isDupBest)return 1;var av=parseFloat(b.availRaw)-parseFloat(a.availRaw);return isNaN(av)?0:av;}return a.id-b.id;});
+  var nonDupRows=[],dupGroupMap={};
+  for(var i=0;i<rowList.length;i++){var r=rowList[i];if(r.dupGroup){if(!dupGroupMap[r.dupGroup])dupGroupMap[r.dupGroup]={rows:[]};dupGroupMap[r.dupGroup].rows.push(r);}else{nonDupRows.push(r);}}
+  var result=[],inserted={};
+  for(var i=0;i<nonDupRows.length;i++){
+    result.push(nonDupRows[i]);
+    for(var grp in dupGroupMap){if(inserted[grp])continue;var grpRows=dupGroupMap[grp].rows,bestRow=null;for(var j=0;j<grpRows.length;j++){if(grpRows[j].isDupBest){bestRow=grpRows[j];break;}}if(!bestRow)bestRow=grpRows[0];if(bestRow.id<=nonDupRows[i].id){grpRows.sort(function(a,b){if(a.isDupBest)return-1;if(b.isDupBest)return 1;return parseFloat(b.availRaw)-parseFloat(a.availRaw);});for(var j=0;j<grpRows.length;j++)result.push(grpRows[j]);inserted[grp]=true;}}
+  }
+  for(var grp in dupGroupMap){if(!inserted[grp]){var grpRows=dupGroupMap[grp].rows;grpRows.sort(function(a,b){if(a.isDupBest)return-1;if(b.isDupBest)return 1;return parseFloat(b.availRaw)-parseFloat(a.availRaw);});for(var j=0;j<grpRows.length;j++)result.push(grpRows[j]);}}
+  return result;
+}
+
+function startProcess(){
+  if(!dtRaw.length){alert("Please upload the Dynatrace file first.");return;}
+  var btn=document.getElementById("proc-btn");btn.disabled=true;btn.textContent="Processing...";
+  setProg(2,"Starting...","Step 1: Building CMDB map...");
+  setTimeout(function(){
+    var cmdbMap={};try{cmdbMap=buildCmdbMap();}catch(e){console.warn(e);}
+    setProg(10,"Step 2...","Step 2: Building ping + Ansible maps...");
+    setTimeout(function(){
+      var pingMap={};try{pingMap=buildPingMap();}catch(e){console.warn(e);}
+      var ansibleMap={};try{ansibleMap=buildAnsibleMap();}catch(e){console.warn(e);}
+      var T=getThresholds();
+      var retKw=lc(document.getElementById("kw-ret").value);
+      var mntKw=lc(document.getElementById("kw-mnt").value);
+      var prodKw=trimStr(document.getElementById("kw-prod").value);
+      var drKw=trimStr(document.getElementById("kw-dr").value);
+      var nCol=document.getElementById("map-name").value;
+      var aCol=document.getElementById("map-avail").value;
+      setProg(18,"0 / "+dtRaw.length,"Step 3: Categorizing rows...");
+      var newRows=[],total=dtRaw.length,CHUNK=300,idx=0;
+      setTimeout(function tick(){
+        var end=Math.min(idx+CHUNK,total);
+        for(var i=idx;i<end;i++){
+          var r=dtRaw[i],raw=trimStr(String(r[nCol]||""));if(!raw)continue;
+          // Use unified applyTrim for DT short name
+          var sn=applyTrim(raw);
+          var av=parseFloat(r[aCol]);
+          var e2=cmdbMap[sn]||null;
+          var uf=e2?String(e2.usedFor||""):"";
+          var tsg=e2?String(e2.tsg||""):"";
+          var isDR=uf.toLowerCase().indexOf(drKw.toLowerCase())>=0;
+          var isProd=!isDR&&uf.toLowerCase().indexOf(prodKw.toLowerCase())>=0;
+          var cat="";try{cat=autoCategory(sn,av,cmdbMap,pingMap,T,retKw,mntKw,prodKw,drKw);}catch(ex){cat="Check Manually";}
+          newRows.push({id:i,rawName:raw,shortName:sn,availRaw:av,isProd:isProd,isDR:isDR,usedFor:uf,tsg:tsg,cmdbStatus:e2?String(e2.status||""):null,cmdbIsNew:e2?!!e2.isNew:false,cmdbCreatedFmt:e2?String(e2.createdFmt||""):"",cmdbRetiredDate:e2?String(e2.retiredDateFmt||""):"",cmdbOwner:e2?String(e2.owner||""):"",pingStatus:pingMap[sn]!==undefined?pingMap[sn]:null,ansibleStatus:null,ansibleCmd:null,category:cat,notes:"",dupGroup:null,dupCount:1,isDupBest:false,isDupNonBest:false});
+        }
+        idx=end;
+        var pct=Math.round(18+(idx/total)*68);
+        setProg(pct,idx+" / "+total+" rows","Categorized "+newRows.length+" servers...");
+        if(idx<total){setTimeout(tick,0);}
+        else{
+          setProg(88,total+" rows","Step 4: Processing duplicates...");
+          newRows=processDuplicates(newRows);
+          setProg(94,total+" rows","Step 5: Applying Ansible check results...");
+          if(Object.keys(ansibleMap).length>0)newRows=applyAnsibleMap(newRows,ansibleMap);
+          rows=newRows;sel={};
+          setProg(100,total+" / "+total+" rows","Done! "+rows.length+" servers processed.","#198754");
+          btn.disabled=false;btn.textContent="Re-process \u2192";
+          populateOwnerFilter();curPage=1;renderTable();showTab("review");
+        }
+      },0);
+    },0);
+  },0);
+}
+
+function populateOwnerFilter(){
+  var owners={};for(var i=0;i<rows.length;i++){if(rows[i].cmdbOwner)owners[rows[i].cmdbOwner]=true;}
+  var s=document.getElementById("fo");s.innerHTML="<option value=''>All owners</option>";
+  Object.keys(owners).sort().forEach(function(k){var o=document.createElement("option");o.value=k;o.textContent=k;s.appendChild(o);});
+}
+
+function getFiltered(){
+  var q=lc(document.getElementById("ft").value||"");
+  var cat=document.getElementById("fc").value;
+  var own=document.getElementById("fo").value;
+  var env=document.getElementById("fenv").value;
+  var res=[];
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    var mq=!q||r.shortName.indexOf(q)>=0||r.rawName.toLowerCase().indexOf(q)>=0||(r.category||"").toLowerCase().indexOf(q)>=0||(r.cmdbOwner||"").toLowerCase().indexOf(q)>=0||(r.tsg||"").toLowerCase().indexOf(q)>=0;
+    var mc=!cat||(cat==="__blank__"?!r.category:false)||(cat==="__manual__"?r.category==="Check Manually":false)||(cat==="__sla__"?r.category==="Available in SLA Threshold limit":false)||(cat==="__nocmdb__"?r.category==="CMDB Data Not Found / Failed Server Build":false)||(cat==="__dr__"?r.category==="DR Server / In Maintenance":false)||(cat==="__hcnm__"?r.category==="HC Linux not managed":false)||(cat==="__dup__"?!!r.dupGroup:false)||r.category===cat;
+    var mo=!own||r.cmdbOwner===own;
+    var me=!env||(env==="prod"?r.isProd:false)||(env==="nonp"?(!r.isProd&&!r.isDR):false)||(env==="dr"?r.isDR:false);
+    if(mq&&mc&&mo&&me)res.push(r);
+  }
+  return res;
+}
+
+function cmdbBadge(r){
+  var st=r.cmdbStatus;
+  var retKw=lc(document.getElementById("kw-ret").value);
+  var mntKw=lc(document.getElementById("kw-mnt").value);
+  var newTag=r.cmdbIsNew?" <span class='badge b-new'>new</span>"+(r.cmdbCreatedFmt?" <small style='color:#0d6e4a;'>(built "+esc(r.cmdbCreatedFmt)+")</small>":""):"";
+  var retTag=r.cmdbRetiredDate?" <small style='color:#4a3fa0;'>(retired "+esc(r.cmdbRetiredDate)+")</small>":"";
+  if(st===null)return"<span style='color:#c0392b;font-size:11px;font-weight:700;'>Not in CMDB</span>";
+  if(st==="")return"<span class='badge b-blank'>blank</span>";
+  if(st.indexOf(retKw)>=0)return"<span class='badge b-ret'>"+esc(st)+"</span>"+retTag+newTag;
+  if(st.indexOf(mntKw)>=0)return"<span class='badge b-mnt'>"+esc(st)+"</span>"+newTag;
+  return"<span class='badge b-act'>"+esc(st)+"</span>"+newTag;
+}
+function tsgBadge(tsg){if(!tsg)return"<span style='color:#bbb;'>&#8212;</span>";if(!isHCManagedTSG(tsg))return"<span class='badge b-hcnm' title='"+esc(tsg)+"'>&#9888; "+esc(tsg.length>22?tsg.substring(0,20)+"...":tsg)+"</span>";return"<span style='font-size:11px;color:#155724;' title='"+esc(tsg)+"'>"+esc(tsg.length>22?tsg.substring(0,20)+"...":tsg)+"</span>";}
+function pingBadge(st){if(!st)return"<span class='badge b-pna'>No data</span>";if(st.indexOf("unreachable")>=0||st==="error")return"<span class='badge b-pdn'>Unreachable</span>";if(st.indexOf("reachable")>=0)return"<span class='badge b-pup'>Reachable</span>";return"<span class='badge b-pna'>"+esc(st)+"</span>";}
+function ansibleBadge(r){if(!r.ansibleStatus)return"<span class='badge b-pna'>No data</span>";var lcs=lc(r.ansibleStatus);if(lcs.indexOf("scheduled")>=0||lcs.indexOf("reboot")>=0)return"<span class='badge b-ansible' title='"+esc(r.ansibleCmd||"")+"'>Sched.Reboot</span>";if(lcs.indexOf("powered off")>=0)return"<span class='badge b-pdn' title='"+esc(r.ansibleCmd||"")+"'>Powered Off</span>";return"<span class='badge b-pna' title='"+esc(r.ansibleCmd||"")+"'>"+esc(r.ansibleStatus.substring(0,14))+"</span>";}
+function envBadge(r){if(!r.usedFor)return"<span class='badge b-pna'>?</span>";if(r.isDR)return"<span class='badge' style='background:#dbeafe;color:#1a56a0;'>DR</span>";return r.isProd?"<span class='badge b-prod'>Prod</span>":"<span class='badge b-nonp'>Non-Prod</span>";}
+
+function renderTable(){
+  updateDlBtn();
+  var unc=0,man=0;for(var i=0;i<rows.length;i++){if(!rows[i].category)unc++;if(rows[i].category==="Check Manually")man++;}
+  var ban=document.getElementById("rev-ban");
+  if(unc+man>0){ban.className="banner ban-w";ban.textContent=man+" flagged Check Manually, "+unc+" uncategorized.";}
+  else{ban.className="banner ban-ok";ban.textContent="All servers categorized. Ready to export.";}
+  var scnt=0;for(var k in sel){if(sel[k])scnt++;}
+  document.getElementById("sel-cnt").textContent="("+scnt+" selected)";
+  var filt=getFiltered(),total=filt.length;
+  var totPg=Math.max(1,Math.ceil(total/pgSize));if(curPage>totPg)curPage=totPg;
+  var s=(curPage-1)*pgSize,e=Math.min(s+pgSize,total),page=filt.slice(s,e);
+  var html="";
+  for(var i=0;i<page.length;i++){
+    var r=page[i],isSel=!!sel[r.id];
+    var rc="";
+    if(isSel){rc="rsel";}
+    else if(r.dupGroup){var isFirst=(i===0||!page[i-1].dupGroup||page[i-1].dupGroup!==r.dupGroup);var isLast=(i===page.length-1||!page[i+1].dupGroup||page[i+1].dupGroup!==r.dupGroup);if(isFirst&&isLast)rc="rdup";else if(isFirst)rc="rdup-first";else if(isLast)rc="rdup-last";else rc="rdup";}
+    else if(r.category==="Check Manually"||r.category==="CMDB Data Not Found / Failed Server Build"||r.category==="HC Linux not managed"||!r.category){rc="runc";}
+    var opts="<option value=''>-- select --</option>";
+    for(var j=0;j<CATS.length;j++){opts+="<option value='"+esc(CATS[j])+"'"+(r.category===CATS[j]?" selected":"")+">"+esc(CATS[j])+"</option>";}
+    var snCell=esc(r.shortName);
+    if(r.dupGroup){var icon=r.isDupBest?"&#128258;":"&#128259;";var lbl=r.isDupBest?"Best ("+fmtPct(r.availRaw)+")":"Dup "+(r.isDupNonBest?fmtPct(r.availRaw):"");snCell+=" <span class='badge b-dup' title='Dup group: "+esc(r.dupGroup)+"'>"+icon+" "+esc(lbl)+"</span>";}
+    html+="<tr class='"+rc+"'>";
+    html+="<td><input type='checkbox'"+(isSel?" checked":"")+" onchange='toggleRow("+r.id+",this.checked)'></td>";
+    // Trimmed Name column (shortName = already trimmed)
+    html+="<td style='font-family:monospace;font-size:11px;white-space:nowrap;'>"+snCell+"</td>";
+    // Original Name column
+    html+="<td style='font-family:monospace;font-size:11px;color:#666;word-break:break-all;max-width:160px;'>"+esc(r.rawName)+"</td>";
+    html+="<td class='"+avCls(r.availRaw)+"' style='white-space:nowrap;'>"+fmtPct(r.availRaw)+"</td>";
+    html+="<td>"+envBadge(r)+"</td>";
+    html+="<td>"+cmdbBadge(r)+"</td>";
+    html+="<td style='font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;' title='"+esc(r.cmdbOwner||"")+"'>"+(r.cmdbOwner?esc(r.cmdbOwner):"<span style='color:#bbb;'>&#8212;</span>")+"</td>";
+    html+="<td style='max-width:150px;'>"+tsgBadge(r.tsg)+"</td>";
+    html+="<td>"+pingBadge(r.pingStatus)+"</td>";
+    html+="<td>"+ansibleBadge(r)+"</td>";
+    html+="<td><select onchange='updateRow("+r.id+",\"category\",this.value)'>"+opts+"</select></td>";
+    html+="<td><input type='text' value='"+esc(r.notes||"")+"' placeholder='notes' onchange='updateRow("+r.id+",\"notes\",this.value)'></td>";
+    html+="</tr>";
+  }
+  if(!html)html="<tr><td colspan='12' style='text-align:center;padding:20px;color:#888;'>No matching rows</td></tr>";
+  document.getElementById("tbl").innerHTML=html;
+  var pg="<div style='display:flex;align-items:center;gap:6px;margin-top:10px;font-size:12px;flex-wrap:wrap;'>";
+  pg+="<span style='color:#555;'>"+total+" servers";if(total>pgSize)pg+=" | Showing "+(s+1)+"&ndash;"+e;pg+="</span>";
+  if(totPg>1){
+    pg+="<button class='btnsm' onclick='goPage("+(curPage-1)+")' "+(curPage<=1?"disabled":"")+">&#8592; Prev</button>";
+    for(var p2=1;p2<=totPg;p2++){if(p2===1||p2===totPg||(p2>=curPage-2&&p2<=curPage+2)){pg+="<button class='btnsm' onclick='goPage("+p2+")' style='"+(p2===curPage?"background:#3b5bdb;color:#fff;border-color:#3b5bdb;":"")+">"+p2+"</button>";}else if(p2===curPage-3||p2===curPage+3){pg+="<span style='color:#aaa;'>&#8230;</span>";}}
+    pg+="<button class='btnsm' onclick='goPage("+(curPage+1)+")' "+(curPage>=totPg?"disabled":"")+">Next &#8594;</button>";
+    pg+="<select class='smsel' onchange='chgPgSz(this.value)'>";[50,100,200,500].forEach(function(n){pg+="<option value='"+n+"'"+(pgSize===n?" selected":"")+">"+n+" / page</option>";});pg+="</select>";
+  }
+  pg+="</div>";document.getElementById("pgn").innerHTML=pg;
+}
+
+function goPage(p){var f=getFiltered();var maxP=Math.max(1,Math.ceil(f.length/pgSize));curPage=Math.max(1,Math.min(p,maxP));renderTable();}
+function chgPgSz(n){pgSize=parseInt(n);curPage=1;renderTable();}
+function updateRow(id,field,val){for(var i=0;i<rows.length;i++){if(rows[i].id===id){rows[i][field]=val;break;}}var unc=0,man=0;for(var i=0;i<rows.length;i++){if(!rows[i].category)unc++;if(rows[i].category==="Check Manually")man++;}var ban=document.getElementById("rev-ban");if(unc+man>0){ban.className="banner ban-w";ban.textContent=man+" flagged Check Manually, "+unc+" uncategorized.";}else{ban.className="banner ban-ok";ban.textContent="All servers categorized. Ready to export.";}}
+function toggleRow(id,v){sel[id]=v;var c=0;for(var k in sel){if(sel[k])c++;}document.getElementById("sel-cnt").textContent="("+c+" selected)";}
+function toggleAll(v){var f=getFiltered();for(var i=0;i<f.length;i++)sel[f[i].id]=v;renderTable();}
+function selAllVis(){toggleAll(true);}
+function deselAll(){sel={};renderTable();}
+function applyBulk(){
+  var cat=document.getElementById("bulk-cat").value;var note=document.getElementById("bulk-note").value;
+  if(!cat){alert("Select a category.");return;}
+  var ids=[];for(var k in sel){if(sel[k])ids.push(parseInt(k));}
+  if(!ids.length){alert("Check at least one row.");return;}
+  for(var i=0;i<rows.length;i++){for(var j=0;j<ids.length;j++){if(rows[i].id===ids[j]){rows[i].category=cat;if(note)rows[i].notes=note;}}}
+  sel={};document.getElementById("bulk-cat").value="";document.getElementById("bulk-note").value="";renderTable();
+}
+
+function renderSummary(){
+  if(!rows.length){document.getElementById("sum-body").innerHTML="<p style='color:#888;'>Process data first.</p>";return;}
+  var sm={},prod=0,nonp=0;
+  for(var i=0;i<rows.length;i++){var r=rows[i],k=r.category||"Uncategorized";sm[k]=(sm[k]||0)+1;if(r.isProd)prod++;else nonp++;}
+  var total=rows.length,man=sm["Check Manually"]||0,hcnm=sm["HC Linux not managed"]||0,dups=sm["Duplicate - Check Manually"]||0;
+  var html="<div class='metrics'>";
+  html+="<div class='mc'><div class='lb'>Total servers</div><div class='vl'>"+total+"</div></div>";
+  html+="<div class='mc'><div class='lb'>Production</div><div class='vl' style='color:#856404'>"+prod+"</div></div>";
+  html+="<div class='mc'><div class='lb'>Non-Production</div><div class='vl' style='color:#1a56a0'>"+nonp+"</div></div>";
+  html+="<div class='mc'><div class='lb'>Duplicates</div><div class='vl' style='color:#d63384'>"+dups+"</div></div>";
+  html+="<div class='mc'><div class='lb'>HC Linux not managed</div><div class='vl' style='color:#7a1010'>"+hcnm+"</div></div>";
+  html+="</div><p style='font-weight:700;margin-bottom:12px;'>Breakdown by category</p>";
+  var keys=Object.keys(sm).sort(function(a,b){return sm[b]-sm[a];});
+  for(var i=0;i<keys.length;i++){var k=keys[i],cnt=sm[k],p=Math.round(cnt/total*100),col=CCOL[k]||"#888";html+="<div class='brow'><span class='blbl'>"+esc(k)+"</span><div class='btrk'><div class='bfil' style='width:"+p+"%;background:"+col+"'></div></div><span class='bcnt'>"+cnt+" ("+p+"%)</span></div>";}
+  html+="<div style='margin-top:20px;display:flex;gap:10px;'><button class='btnp' onclick='exportXLSX()'>&#11015; Export Excel (.xlsx)</button><button class='btns' onclick='showTab(\"review\")'>Back to Review</button></div>";
+  document.getElementById("sum-body").innerHTML=html;
+}
+
+function exportXLSX(){
+  if(!rows.length){alert("No data to export.");return;}
+  var data=[];
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    data.push({
+      "Trimmed Name":r.shortName,
+      "Original Server Name":r.rawName,
+      "Host Availability %":fmtPct(r.availRaw),
+      "Environment":r.isProd?"Production":"Non-Production",
+      "Used For":r.usedFor||"",
+      "Technical Support Group":r.tsg||"",
+      "CMDB Install Status":r.cmdbStatus!==null?r.cmdbStatus:"Not in CMDB",
+      "CMDB Created Date":r.cmdbCreatedFmt||"",
+      "Retired Date":r.cmdbRetiredDate||"",
+      "Newly Built":r.cmdbIsNew?"Yes":"No",
+      "Owned By":r.cmdbOwner||"",
+      "Ping Status":r.pingStatus||"Not checked",
+      "Ansible Check Status":r.ansibleStatus||"",
+      "Ansible Command":r.ansibleCmd||"",
+      "Duplicate Group":r.dupGroup||"",
+      "Category":r.category||"Uncategorized",
+      "Notes":r.notes||""
+    });
+  }
+  var ws=XLSX.utils.json_to_sheet(data);
+  ws["!cols"]=[{wch:22},{wch:46},{wch:20},{wch:16},{wch:18},{wch:32},{wch:20},{wch:18},{wch:16},{wch:12},{wch:24},{wch:16},{wch:22},{wch:46},{wch:20},{wch:36},{wch:40}];
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,"Availability Report");
+  var sm={};for(var i=0;i<rows.length;i++){var k=rows[i].category||"Uncategorized";sm[k]=(sm[k]||0)+1;}
+  var sk=Object.keys(sm).sort(function(a,b){return sm[b]-sm[a];}),sd=[];
+  for(var i=0;i<sk.length;i++){sd.push({"Category":sk[i],"Count":sm[sk[i]],"% of Total":(sm[sk[i]]/rows.length*100).toFixed(1)+"%"});}
+  var ws2=XLSX.utils.json_to_sheet(sd);ws2["!cols"]=[{wch:36},{wch:10},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws2,"Summary");
+  XLSX.writeFile(wb,"Host_Availability_Report.xlsx");
+}
+</script>
+</body>
+</html>

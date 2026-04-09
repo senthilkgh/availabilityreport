@@ -1,0 +1,176 @@
+---
+# check_servers.yml
+# Run from jump server:
+#   ansible-playbook check_servers.yml -i inventory.ini -u jumpuser --become --become-user root
+#
+# Logic (OR condition — either is enough for "Scheduled reboot by customer"):
+#   CHECK 1: last | grep boot | cut -f 8-11 -d ' '
+#            → count non-empty output lines
+#            → > 1 line  => Scheduled reboot by customer
+#            → 0 or 1 line => Customer Powered Off  (unless check 2 fires)
+#   CHECK 2: cat /var/log/messages | grep 'Stopped Record...'
+#            → any output => Scheduled reboot by customer
+#
+# If EITHER fires => "Scheduled reboot by customer"
+# If NEITHER fires => "Customer Powered Off"
+# CSV columns: hostname,reported_by_command,status
+
+- name: Check Manually — Server Boot Status Investigation
+  hosts: all
+  gather_facts: no
+  become: yes
+  become_method: sudo
+  become_user: root
+
+  vars:
+    report_dir: "/tmp/ansible_reports"
+    email_to: "senthil-kumar.giritharan@allianz.com"
+
+  tasks:
+
+    - name: Remove old per-server CSV reports from previous runs
+      delegate_to: localhost
+      run_once: yes
+      shell: "rm -f {{ report_dir }}/*_check.csv {{ report_dir }}/ansible_check_combined.csv 2>/dev/null || true"
+      changed_when: false
+
+    - name: Create report directory on jump server
+      delegate_to: localhost
+      run_once: yes
+      file:
+        path: "{{ report_dir }}"
+        state: directory
+        mode: '0755'
+
+    # ── CHECK 1: count boot lines from last ──────────────────────────────
+    - name: Count boot entries from last command
+      shell: |
+        COUNT=$(last 2>/dev/null | grep -i boot | cut -f8-11 -d' ' | grep -c . || echo 0)
+        echo $COUNT
+      register: boot_count_raw
+      ignore_errors: yes
+      changed_when: false
+
+    # ── CHECK 2: UTMP log check ───────────────────────────────────────────
+    - name: Count UTMP boot/shutdown entries in messages log
+      shell: |
+        COUNT=$(cat /var/log/messages 2>/dev/null | grep -c 'Stopped Record System Boot/Shutdown in UTMP' || echo 0)
+        echo $COUNT
+      register: utmp_count_raw
+      ignore_errors: yes
+      changed_when: false
+
+    # ── Determine final counts safely ────────────────────────────────────
+    - name: Parse counts and set status
+      set_fact:
+        boot_count: "{{ boot_count_raw.stdout | default('0') | trim | int }}"
+        utmp_count: "{{ utmp_count_raw.stdout | default('0') | trim | int }}"
+
+    - name: Set host_status
+      set_fact:
+        host_status: "{{ 'Scheduled reboot by customer' if (boot_count | int > 1 or utmp_count | int > 0) else 'Customer Powered Off' }}"
+
+    - name: Set reported_by_command
+      set_fact:
+        reported_by_command: >-
+          {%- if boot_count | int > 1 and utmp_count | int > 0 -%}
+            last|grep boot|cut -f8-11 -d' ' ({{ boot_count }} lines) AND /var/log/messages UTMP check ({{ utmp_count }} entries)
+          {%- elif boot_count | int > 1 -%}
+            last|grep boot|cut -f8-11 -d' ' ({{ boot_count }} lines found)
+          {%- elif utmp_count | int > 0 -%}
+            cat /var/log/messages|grep 'Stopped Record System Boot/Shutdown in UTMP' ({{ utmp_count }} entries)
+          {%- else -%}
+            last|grep boot|cut -f8-11 -d' ' returned {{ boot_count }} line(s) - Customer Powered Off
+          {%- endif -%}
+
+    # ── Write per-server result CSV on jump server ────────────────────────
+    - name: Write per-server CSV
+      delegate_to: localhost
+      copy:
+        content: "hostname,reported_by_command,status\n{{ inventory_hostname }},\"{{ reported_by_command }}\",\"{{ host_status }}\"\n"
+        dest: "{{ report_dir }}/{{ inventory_hostname }}_check.csv"
+
+    - name: Debug result (visible in ansible output)
+      debug:
+        msg: "{{ inventory_hostname }} => {{ host_status }} | boot_lines={{ boot_count }} utmp_entries={{ utmp_count }}"
+
+
+# ── Play 2: Combine CSVs and email ─────────────────────────────────────
+- name: Combine all per-server CSVs and send email
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    report_dir: "/tmp/ansible_reports"
+    combined_csv: "{{ report_dir }}/ansible_check_combined.csv"
+    email_to: "senthil-kumar.giritharan@allianz.com"
+
+  tasks:
+
+    - name: Write combined CSV header
+      copy:
+        content: "hostname,reported_by_command,status\n"
+        dest: "{{ combined_csv }}"
+
+    - name: Append each per-server CSV (skip header line)
+      shell: "tail -n +2 {{ item }} >> {{ combined_csv }}"
+      with_fileglob:
+        - "{{ report_dir }}/*_check.csv"
+
+    - name: Verify combined CSV content
+      shell: "cat {{ combined_csv }}"
+      register: combined_content
+      changed_when: false
+
+    - name: Show combined CSV content
+      debug:
+        msg: "{{ combined_content.stdout_lines }}"
+
+    - name: Send combined CSV by email using shell mail command
+      shell: >
+        echo "Ansible server check report attached.
+        Boot status check completed. Upload ansible_check_combined.csv to the Host Availability Report Builder." |
+        mail -s "[HC Linux] Ansible Check Manually Report - $(date +%Y-%m-%d)"
+        -a "{{ combined_csv }}"
+        "{{ email_to }}"
+      ignore_errors: yes
+
+    - name: Print report location
+      debug:
+        msg: "Combined report saved at: {{ combined_csv }} — upload this file to the Report Builder."
+
+
+# ── Play 2: Combine CSVs and email ─────────────────────────────────────
+- name: Combine all per-server CSVs and send email
+  hosts: localhost
+  gather_facts: no
+
+  vars:
+    report_dir: "/tmp/ansible_reports"
+    combined_csv: "{{ report_dir }}/ansible_check_combined.csv"
+    email_to: "senthil-kumar.giritharan@allianz.com"
+
+  tasks:
+
+    - name: Write combined CSV header
+      copy:
+        content: "hostname,reported_by_command,status\n"
+        dest: "{{ combined_csv }}"
+
+    - name: Append each per-server CSV (skip header)
+      shell: "tail -n +2 {{ item }} >> {{ combined_csv }}"
+      with_fileglob:
+        - "{{ report_dir }}/*_check.csv"
+
+    - name: Send combined CSV by email using shell mail command
+      shell: >
+        echo "Please find the attached Ansible server check report.
+        Upload ansible_check_combined.csv to the Host Availability Report Builder." |
+        mail -s "[HC Linux] Ansible Check Manually Report - $(date +%Y-%m-%d)"
+        -a "{{ combined_csv }}"
+        "{{ email_to }}"
+      ignore_errors: yes
+
+    - name: Print report location
+      debug:
+        msg: "Combined report: {{ combined_csv }} — upload this to the Report Builder."

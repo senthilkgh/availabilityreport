@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Customer Success – Linux & AIX | Hybrid Cloud Enablement - Host Availability Report Builder</title>
+<script src="xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Arial,sans-serif;font-size:13px;color:#1a1a1a;background:#fff;padding:20px;}
+h2{font-size:18px;font-weight:700;margin-bottom:2px;}
+.sub{font-size:12px;color:#888;margin-bottom:16px;}
+.tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap;}
+.tab{padding:7px 16px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;}
+.tab.active{background:#e8eeff;border-color:#3b5bdb;font-weight:700;color:#3b5bdb;}
+.sec{display:none;}
+.sec.on{display:block;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px;}
+.ubox{border:2px dashed #ccc;border-radius:8px;padding:20px 14px;text-align:center;cursor:pointer;background:#fafafa;}
+.ubox:hover{background:#f0f4ff;}
+.ubox input[type=file]{display:none;}
+.cmap{font-size:11px;color:#555;margin-top:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;line-height:2.4;}
+.rbox{background:#f7f7f7;border-radius:8px;padding:14px;margin-bottom:14px;}
+.tbox{background:#fff;border:1px solid #ddd;border-radius:8px;padding:14px;margin-bottom:14px;}
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.tcard{background:#f7f7f7;border-radius:6px;padding:10px 14px;}
+.tcard-title{font-weight:700;font-size:13px;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #ddd;}
+.trow{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;}
+.trow label{color:#555;flex:1;}
+.trow input[type=number]{width:70px;padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;text-align:center;}
+.trow select{padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;flex:1.5;}
+.rcards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.rc{padding:9px 12px;border-radius:6px;font-size:12px;line-height:1.5;}
+.rc strong{display:block;margin-bottom:2px;font-size:13px;}
+.rc span{color:#555;}
+.pbox{background:#f0f4ff;border:1px solid #3b5bdb;border-radius:8px;padding:14px;margin-top:14px;}
+.pbar-wrap{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.pbar-track{flex:1;background:#dde;border-radius:999px;height:16px;overflow:hidden;border:1px solid #aab;}
+.pbar-fill{height:100%;border-radius:999px;background:#3b5bdb;width:0%;transition:width 0.3s;}
+.pbar-lbl{font-size:12px;font-weight:700;min-width:140px;text-align:right;color:#333;}
+.pbar-status{font-size:12px;color:#444;margin:0;}
+.bulk{background:#f7f7f7;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;}
+.toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center;}
+.toolbar input,.toolbar select{padding:5px 8px;border:1px solid #ccc;border-radius:6px;font-size:13px;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+th{text-align:left;padding:7px 8px;font-size:11px;color:#555;border-bottom:1px solid #ddd;font-weight:700;white-space:nowrap;}
+td{padding:5px 8px;border-bottom:1px solid #eee;vertical-align:middle;}
+td select,td input[type=text]{width:100%;padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;}
+.rsel{background:#eef3ff!important;}
+.runc{background:#fffbea;}
+.rdup{background:#fff0f8!important;border-left:3px solid #d63384;}
+.rdup-first{background:#fff0f8!important;border-left:3px solid #d63384;border-top:2px solid #d63384;}
+.rdup-last{background:#fff0f8!important;border-left:3px solid #d63384;border-bottom:2px solid #d63384;}
+.banner{padding:9px 14px;border-radius:6px;margin-bottom:12px;font-size:13px;}
+.ban-w{background:#fff3cd;border:1px solid #ffc107;color:#856404;}
+.ban-ok{background:#d4edda;border:1px solid #28a745;color:#155724;}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px;}
+.mc{background:#f7f7f7;border-radius:8px;padding:12px 14px;}
+.mc .lb{font-size:11px;color:#666;margin-bottom:4px;}
+.mc .vl{font-size:20px;font-weight:700;}
+.brow{display:flex;align-items:center;gap:10px;margin-bottom:7px;}
+.blbl{min-width:260px;font-size:13px;}
+.btrk{flex:1;background:#eee;border-radius:4px;height:16px;overflow:hidden;}
+.bfil{height:100%;border-radius:4px;}
+.bcnt{min-width:80px;text-align:right;font-size:12px;color:#666;}
+.btnp{padding:7px 16px;border:1px solid #3b5bdb;border-radius:6px;background:#3b5bdb;color:#fff;font-weight:700;font-size:13px;cursor:pointer;}
+.btnp:disabled{opacity:0.5;cursor:not-allowed;}
+.btns{padding:7px 16px;border:1px solid #ccc;border-radius:6px;background:#f0f0f0;font-weight:600;font-size:13px;cursor:pointer;}
+.btnsm{padding:4px 10px;border:1px solid #ccc;border-radius:5px;background:#f0f0f0;font-size:12px;cursor:pointer;}
+.smsel{padding:3px 6px;border:1px solid #ccc;border-radius:4px;font-size:12px;}
+.sminp{padding:2px 5px;border:1px solid #ccc;border-radius:4px;font-size:12px;}
+.notebox{background:#e8f0fe;border-left:4px solid #3b5bdb;padding:10px 14px;border-radius:4px;font-size:12px;margin-bottom:14px;line-height:1.6;}
+.avok{color:#198754;font-weight:700;}
+.avwn{color:#e67700;font-weight:700;}
+.aver{color:#c0392b;font-weight:700;}
+.nfb{background:#1e1e1e;color:#d4d4d4;padding:14px;border-radius:8px;font-family:Consolas,monospace;font-size:12px;white-space:pre;overflow-x:auto;line-height:1.6;margin:10px 0 14px;}
+.kw{color:#569cd6;}.str{color:#ce9178;}.cm{color:#6a9955;}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;}
+.b-ok{background:#d4edda;color:#155724;}
+.b-ret{background:#ede9ff;color:#4a3fa0;}
+.b-mnt{background:#fde8e8;color:#a02020;}
+.b-act{background:#d4edda;color:#155724;}
+.b-new{background:#d4f5e9;color:#0d6e4a;}
+.b-pup{background:#d4edda;color:#155724;}
+.b-pdn{background:#f8d7da;color:#721c24;}
+.b-pna{background:#e2e3e5;color:#383d41;}
+.b-prod{background:#fff3cd;color:#856404;}
+.b-nonp{background:#e8f0fe;color:#1a56a0;}
+.b-warn{background:#fff3cd;color:#856404;}
+.b-blank{background:#fff3cd;color:#856404;font-size:10px;}
+.b-hcnm{background:#fde8e8;color:#7a1010;font-size:11px;}
+.b-dup{background:#ffe0f0;color:#d63384;font-size:11px;}
+.dup-group-label{font-size:10px;color:#d63384;font-weight:700;white-space:nowrap;}
+.author-footer{margin-top:28px;padding:10px 16px;background:#f0f4ff;border:1px solid #c5d0f5;border-radius:8px;font-size:11px;color:#555;display:flex;align-items:center;gap:8px;}
+.author-footer span.af-label{font-weight:700;color:#3b5bdb;}
+@media(max-width:700px){.g3,.metrics,.rcards,.tgrid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<h2>&#127970; Customer Success – Linux & AIX | Hybrid Cloud Enablement - Host Availability Report Builder</h2>
+<p class="sub">Dynatrace + CMDB + Ping Results &rarr; Categorized Excel Report</p>
+
+<!-- INSTRUCTION PANEL -->
+<div id="info-panel" style="background:#fffbe6;border:1px solid #f0c040;border-radius:8px;padding:16px 20px;margin-bottom:18px;">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+    <p style="font-weight:700;font-size:14px;color:#7a5800;margin-bottom:10px;">&#128218; Before You Start — Read This</p>
+    <button onclick="document.getElementById('info-panel').style.display='none'" style="background:none;border:none;font-size:18px;cursor:pointer;color:#7a5800;line-height:1;" title="Dismiss">&#10005;</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:12px;color:#444;">
+    <div>
+      <p style="font-weight:700;color:#1a1a1a;margin-bottom:6px;">&#128202; Dynatrace Report — Required columns:</p>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tr style="background:#fff8e1;"><th style="padding:4px 8px;text-align:left;border:1px solid #e0c060;">Column Name</th><th style="padding:4px 8px;text-align:left;border:1px solid #e0c060;">Description</th></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">servername</td><td style="padding:4px 8px;border:1px solid #eee;">Full or short server hostname</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">host availability %</td><td style="padding:4px 8px;border:1px solid #eee;">Availability as a % value (e.g. 99.97)</td></tr>
+      </table>
+      <p style="margin-top:8px;color:#856404;font-size:11px;">&#9888; Hostname format: the tool auto-strips domain suffixes and lowercases the short name for matching.</p>
+      <div style="margin-top:10px;padding:8px 10px;background:#fff0f8;border:1px solid #f9c;border-radius:4px;font-size:11px;">
+        <strong style="color:#d63384;">&#128259; Duplicate Handling:</strong><br>
+        When the same short hostname appears more than once in DT (e.g. on-prem + cloud migration), all entries are <strong>grouped together</strong> in the review table with a pink border. The entry with the <strong>highest availability</strong> keeps its normal category. All others are flagged <strong>"Duplicate - Check Manually"</strong> for easy side-by-side review.
+      </div>
+    </div>
+    <div>
+      <p style="font-weight:700;color:#1a1a1a;margin-bottom:6px;">&#128450; CMDB Server List — Required &amp; optional columns:</p>
+      <table style="width:100%;border-collapse:collapse;font-size:12px;">
+        <tr style="background:#fff8e1;"><th style="padding:4px 8px;text-align:left;border:1px solid #e0c060;">Column Name</th><th style="padding:4px 8px;text-align:left;border:1px solid #e0c060;">Used For</th><th style="padding:4px 8px;text-align:left;border:1px solid #e0c060;">Required?</th></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">Name</td><td style="padding:4px 8px;border:1px solid #eee;">Server hostname</td><td style="padding:4px 8px;border:1px solid #eee;color:#c0392b;font-weight:700;">Yes</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">Install Status</td><td style="padding:4px 8px;border:1px solid #eee;">Retired / Installed / Maintenance</td><td style="padding:4px 8px;border:1px solid #eee;color:#c0392b;font-weight:700;">Yes</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">Used for</td><td style="padding:4px 8px;border:1px solid #eee;">Production / DR / Non-Prod SLA logic</td><td style="padding:4px 8px;border:1px solid #eee;color:#c0392b;font-weight:700;">Yes</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">Technical Support Group</td><td style="padding:4px 8px;border:1px solid #eee;">If not in HC managed groups → HC Linux not managed</td><td style="padding:4px 8px;border:1px solid #eee;color:#c0392b;font-weight:700;">Yes</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">Created</td><td style="padding:4px 8px;border:1px solid #eee;">Build date — flags Newly Built Server</td><td style="padding:4px 8px;border:1px solid #eee;color:#e67700;">Recommended</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">Retired Date</td><td style="padding:4px 8px;border:1px solid #eee;">Date shown on Retired/Decommission tag</td><td style="padding:4px 8px;border:1px solid #eee;color:#e67700;">Recommended</td></tr>
+        <tr><td style="padding:4px 8px;border:1px solid #eee;font-family:monospace;">Owned by</td><td style="padding:4px 8px;border:1px solid #eee;">Owner filter</td><td style="padding:4px 8px;border:1px solid #eee;color:#c0392b;font-weight:700;">Yes</td></tr>
+      </table>
+      <div style="margin-top:8px;padding:6px 10px;background:#fff8e1;border-radius:4px;border:1px solid #f0c040;font-size:11px;">
+        <p style="color:#856404;">&#9888; CMDB hostname must match the <strong>short name</strong> of the DT server (first part before the first dot, lowercase). E.g. <code>slb28889.srv.allianz</code> &rarr; matched as <code>slb28889</code>.</p><br>
+        <strong>HC Managed TSG groups (case-insensitive):</strong><br>
+        A.TEC.GLOB.HC.APAC.LINUX &nbsp;|&nbsp; A.TEC.GLOB.HC.LINUX &nbsp;|&nbsp; AZTEC.AU.LINUX &nbsp;|&nbsp; A.TEC.GLOB.ITSM.HMO.OS-LINUX
+      </div>
+    </div>
+  </div>
+  <div style="margin-top:12px;padding:10px 14px;background:#fff;border-radius:6px;border:1px solid #e0c060;font-size:12px;">
+    <p style="font-weight:700;margin-bottom:6px;color:#1a1a1a;">&#128269; Review Tab — Filter dropdown explained:</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+      <div><span style="font-family:monospace;background:#f0f0f0;padding:1px 6px;border-radius:4px;">-- Uncategorized rows --</span><br>Rows not yet assigned any category</div>
+      <div><span style="font-family:monospace;background:#f0f0f0;padding:1px 6px;border-radius:4px;">-- Check Manually rows --</span><br>Rows flagged for manual investigation</div>
+      <div><span style="font-family:monospace;background:#f0f0f0;padding:1px 6px;border-radius:4px;">-- SLA OK rows --</span><br>Servers within availability SLA</div>
+      <div><span style="font-family:monospace;background:#f0f0f0;padding:1px 6px;border-radius:4px;">-- Duplicate rows --</span><br>All rows that share a short hostname</div>
+    </div>
+    <p style="margin-top:8px;color:#555;">The exact category names below the divider line filter to <strong>only</strong> that category. Use <strong>Select all visible</strong> after filtering to bulk-assign a group of servers at once.</p>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('upload')">1. Upload Files</button>
+  <button class="tab" onclick="showTab('review')">2. Review &amp; Categorize</button>
+  <button class="tab" onclick="showTab('summary')">3. Summary &amp; Export</button>
+  <button class="tab" onclick="showTab('psguide')">&#9654; PowerShell Guide</button>
+</div>
+
+<!-- TAB 1: UPLOAD -->
+<div id="sec-upload" class="sec on">
+  <div class="notebox">
+    <strong>Workflow:</strong> (1) Upload Dynatrace report &nbsp;|&nbsp;
+    (2) Upload CMDB list &nbsp;|&nbsp;
+    (3) Optionally run PowerShell ping script &rarr; upload ping CSV &nbsp;|&nbsp;
+    (4) Set thresholds &amp; Click Process.
+  </div>
+  <div class="g3">
+    <div>
+      <p style="font-weight:700;margin-bottom:4px;">&#128202; Dynatrace Report <span style="color:red">*</span></p>
+      <p style="font-size:11px;color:#888;margin-bottom:6px;">server name + host availability % columns</p>
+      <div class="ubox" onclick="document.getElementById('dt-file').click()">
+        <div style="font-size:22px;margin-bottom:4px;">&#128202;</div>
+        <strong>Click to upload</strong>
+        <div style="font-size:11px;color:#888;">.xlsx / .xls / .csv</div>
+        <div id="dt-st" style="margin-top:6px;"></div>
+        <input type="file" id="dt-file" accept=".xlsx,.xls,.csv" onchange="loadFile(event,'dt')">
+      </div>
+      <div id="dt-map" class="cmap" style="display:none;">
+        Server col: <select class="smsel" id="map-name"></select>
+        &nbsp;Avail col: <select class="smsel" id="map-avail"></select>
+      </div>
+    </div>
+    <div>
+      <p style="font-weight:700;margin-bottom:4px;">&#128450; CMDB Server List <span style="color:#888;font-weight:400;">(optional)</span></p>
+      <p style="font-size:11px;color:#888;margin-bottom:6px;">hostname, Install Status, Used for, TSG, Created, Retired Date, Owned By</p>
+      <div class="ubox" onclick="document.getElementById('cmdb-file').click()">
+        <div style="font-size:22px;margin-bottom:4px;">&#128450;</div>
+        <strong>Click to upload</strong>
+        <div style="font-size:11px;color:#888;">.xlsx / .xls / .csv</div>
+        <div id="cmdb-st" style="margin-top:6px;"></div>
+        <input type="file" id="cmdb-file" accept=".xlsx,.xls,.csv" onchange="loadFile(event,'cmdb')">
+      </div>
+      <div id="cmdb-map" class="cmap" style="display:none;">
+        Host: <select class="smsel" id="map-ch"></select>
+        Status: <select class="smsel" id="map-cs"></select>
+        Used For: <select class="smsel" id="map-uf"></select>
+        TSG: <select class="smsel" id="map-tsg"></select>
+        Created: <select class="smsel" id="map-cc"></select>
+        Retired Date: <select class="smsel" id="map-rd"></select>
+        Owned By: <select class="smsel" id="map-co"></select><br>
+        Retired kw: <input class="sminp" id="kw-ret" value="retired" style="width:75px;">
+        Maint kw: <input class="sminp" id="kw-mnt" value="maintenance" style="width:85px;">
+        Prod value: <input class="sminp" id="kw-prod" value="Production" style="width:90px;">
+        DR value: <input class="sminp" id="kw-dr" value="Disaster Recovery" style="width:120px;">
+      </div>
+    </div>
+    <div>
+      <p style="font-weight:700;margin-bottom:4px;">&#128246; Ping Results CSV <span style="color:#888;font-weight:400;">(optional)</span></p>
+      <p style="font-size:11px;color:#888;margin-bottom:6px;">Generated by the PowerShell script (see guide tab)</p>
+      <div class="ubox" onclick="document.getElementById('ping-file').click()">
+        <div style="font-size:22px;margin-bottom:4px;">&#128246;</div>
+        <strong>Click to upload</strong>
+        <div style="font-size:11px;color:#888;">ping_results.csv only</div>
+        <div id="ping-st" style="margin-top:6px;"></div>
+        <input type="file" id="ping-file" accept=".csv" onchange="loadFile(event,'ping')">
+      </div>
+      <div id="ping-map" class="cmap" style="display:none;">
+        Host: <select class="smsel" id="map-ph"></select>
+        Status: <select class="smsel" id="map-ps"></select>
+      </div>
+    </div>
+  </div>
+
+  <!-- THRESHOLD SETTINGS -->
+  <div class="tbox">
+    <p style="font-weight:700;font-size:13px;color:#3b5bdb;margin-bottom:10px;">&#9881; Availability Threshold Settings <span style="font-size:11px;color:#888;font-weight:400;">(editable — defaults pre-filled)</span></p>
+    <div class="tgrid">
+      <div class="tcard">
+        <div class="tcard-title">&#127381; Production Servers</div>
+        <div class="trow"><label>Available in SLA if availability &ge;</label><input type="number" id="prod-sla" value="99.95" step="0.01" min="0" max="100"> %</div>
+        <div class="trow"><label>Patching Reboot if between</label><input type="number" id="prod-patch-lo" value="90" step="0.01" min="0" max="100"> % and SLA threshold</div>
+        <div class="trow"><label>Below patching threshold &rarr;</label><select id="prod-low-cat"><option>Check Manually</option><option>Customer Powered Off</option><option>Other</option></select></div>
+      </div>
+      <div class="tcard">
+        <div class="tcard-title">&#128187; Non-Production Servers</div>
+        <div class="trow"><label>Available in SLA if availability &ge;</label><input type="number" id="nonp-sla" value="95" step="0.01" min="0" max="100"> %</div>
+        <div class="trow"><label>Patching Reboot if between</label><input type="number" id="nonp-patch-lo" value="90" step="0.01" min="0" max="100"> % and SLA threshold</div>
+        <div class="trow"><label>Below patching threshold &rarr;</label><select id="nonp-low-cat"><option>Check Manually</option><option>Customer Powered Off</option><option>Other</option></select></div>
+      </div>
+      <div class="tcard" style="border:1px solid #b8d0ff;">
+        <div class="tcard-title" style="color:#1a56a0;">&#9874; Disaster Recovery Servers</div>
+        <div style="font-size:12px;color:#555;line-height:1.6;">DR servers follow Non-Production SLA (95%).<br><br>
+        If availability &ge; 95% &rarr; <span style="background:#d4edda;color:#155724;padding:1px 8px;border-radius:999px;font-weight:700;">Available in SLA</span><br>
+        If availability &lt; 95% &rarr; <span style="background:#e8f0fe;color:#1a56a0;padding:1px 8px;border-radius:999px;font-weight:700;">DR Server / In Maintenance</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIC CARDS -->
+  <div class="rbox">
+    <p style="font-weight:700;font-size:13px;margin-bottom:10px;">Auto-categorization logic (applied in this order)</p>
+    <div class="rcards">
+      <div class="rc" style="background:#ffe0f0;border:1px solid #f9c;"><strong>0. Duplicate short name</strong><span>&rarr; Highest avail entry keeps normal category. All others &rarr; Duplicate - Check Manually. Grouped together in table.</span></div>
+      <div class="rc" style="background:#fde8e8;border:1px solid #f5c0c0;"><strong>1. TSG not in HC managed groups</strong><span>&rarr; HC Linux not managed</span></div>
+      <div class="rc" style="background:#d4edda;"><strong>2. Availability &ge; SLA threshold</strong><span>&rarr; Available in SLA Threshold limit</span></div>
+      <div class="rc" style="background:#ede9ff;"><strong>3. CMDB Install Status = Retired</strong><span>&rarr; Retired / Decommission</span></div>
+      <div class="rc" style="background:#e8f0fe;border:1px solid #b8d0ff;"><strong>4. Used For = Disaster Recovery</strong><span>&rarr; DR Server / In Maintenance</span></div>
+      <div class="rc" style="background:#fde8e8;"><strong>5. CMDB Install Status = Maintenance</strong><span>&rarr; Customer Powered Off</span></div>
+      <div class="rc" style="background:#d4f5e9;"><strong>6. CMDB Created within last month</strong><span>&rarr; Newly Built Server</span></div>
+      <div class="rc" style="background:#fff8dc;"><strong>7. Availability &ge; Patching threshold (90%)</strong><span>&rarr; Patching Reboot or Check Manually</span></div>
+      <div class="rc" style="background:#fff3cd;"><strong>8. CMDB not found / incomplete</strong><span>&rarr; CMDB Data Not Found / Failed Server Build</span></div>
+    </div>
+  </div>
+
+  <button class="btnp" id="proc-btn" onclick="startProcess()">Process &amp; Auto-categorize &rarr;</button>
+  <div class="pbox">
+    <div class="pbar-wrap">
+      <div class="pbar-track"><div class="pbar-fill" id="pbar"></div></div>
+      <span class="pbar-lbl" id="plbl">Ready</span>
+    </div>
+    <p class="pbar-status" id="pstat">Upload files above then click the button to start.</p>
+  </div>
+</div>
+
+<!-- TAB 2: REVIEW -->
+<div id="sec-review" class="sec">
+  <div id="rev-ban"></div>
+  <div class="bulk">
+    <strong>Bulk assign <span id="sel-cnt" style="color:#3b5bdb;">(0 selected)</span>:</strong>
+    <select class="smsel" id="bulk-cat" style="min-width:220px;">
+      <option value="">&#8212; pick category &#8212;</option>
+      <option>Available in SLA Threshold limit</option>
+      <option>Newly Built Server</option>
+      <option>Retired/Decommission</option>
+      <option>DR Server / In Maintenance</option>
+      <option>Customer Powered Off</option>
+      <option>Patching Reboot</option>
+      <option>Customer Reboot</option>
+      <option>Check Manually</option>
+      <option>Duplicate - Check Manually</option>
+      <option>CMDB Data Not Found / Failed Server Build</option>
+      <option>HC Linux not managed</option>
+      <option>Other</option>
+    </select>
+    <input class="smsel" id="bulk-note" placeholder="Note (optional)" style="width:170px;">
+    <button class="btnp" onclick="applyBulk()">Apply to selected</button>
+    <button class="btnsm" onclick="selAllVis()">Select all visible</button>
+    <button class="btnsm" onclick="deselAll()">Deselect all</button>
+  </div>
+  <div class="toolbar">
+    <input type="text" id="ft" placeholder="Filter by name, category, owner, TSG..." style="width:240px;" oninput="renderTable()">
+    <select id="fc" onchange="renderTable()">
+      <option value="">All categories</option>
+      <option value="__blank__">-- Uncategorized rows --</option>
+      <option value="__manual__">-- Check Manually rows --</option>
+      <option value="__sla__">-- SLA OK rows --</option>
+      <option value="__nocmdb__">-- CMDB Not Found rows --</option>
+      <option value="__dr__">-- DR Server rows --</option>
+      <option value="__hcnm__">-- HC Linux not managed --</option>
+      <option value="__dup__">-- Duplicate rows --</option>
+      <option disabled>─────────────────</option>
+      <option>Available in SLA Threshold limit</option>
+      <option>Newly Built Server</option>
+      <option>Retired/Decommission</option>
+      <option>DR Server / In Maintenance</option>
+      <option>Customer Powered Off</option>
+      <option>Patching Reboot</option>
+      <option>Customer Reboot</option>
+      <option>Check Manually</option>
+      <option>Duplicate - Check Manually</option>
+      <option>CMDB Data Not Found / Failed Server Build</option>
+      <option>HC Linux not managed</option>
+      <option>Other</option>
+    </select>
+    <select id="fo" onchange="renderTable()"><option value="">All owners</option></select>
+    <select id="fenv" onchange="renderTable()">
+      <option value="">All environments</option>
+      <option value="prod">Production only</option>
+      <option value="nonp">Non-Production only</option>
+      <option value="dr">Disaster Recovery only</option>
+    </select>
+  </div>
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th><input type="checkbox" id="chk-all" onchange="toggleAll(this.checked)"></th>
+          <th>Short Name</th>
+          <th>Original Name</th>
+          <th>Avail %</th>
+          <th>Env</th>
+          <th>CMDB Install Status</th>
+          <th>Owned By</th>
+          <th>Technical Support Group</th>
+          <th>Ping</th>
+          <th>Category</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody id="tbl"></tbody>
+    </table>
+  </div>
+  <div id="pgn"></div>
+  <div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;">
+    <button class="btnp" onclick="exportXLSX()">&#11015; Export Excel (.xlsx)</button>
+    <button class="btns" onclick="showTab('summary')">View Summary &rarr;</button>
+  </div>
+</div>
+
+<!-- TAB 3: SUMMARY -->
+<div id="sec-summary" class="sec"><div id="sum-body"></div></div>
+
+<!-- TAB 4: POWERSHELL -->
+<div id="sec-psguide" class="sec">
+  <div class="notebox">
+    <strong>How it works:</strong> Run the script below from any Windows machine that can reach your servers.
+    It reads your Dynatrace CSV, pings each server, and saves <code>ping_results.csv</code> — upload it in the Upload tab.
+  </div>
+  <p style="font-weight:700;margin-bottom:8px;">Save as <code>ping_servers.ps1</code> and run as Administrator</p>
+  <div class="nfb"><span class="cm"># ping_servers.ps1 — reads DT CSV, pings each server, outputs ping_results.csv</span>
+<span class="kw">param</span>(
+  [string]<span class="str">$In</span>      = <span class="str">"dt_servers.csv"</span>,
+  [string]<span class="str">$Out</span>     = <span class="str">"ping_results.csv"</span>,
+  [int]   <span class="str">$Timeout</span> = 1000
+)
+<span class="str">$data</span> = Import-Csv <span class="str">$In</span>
+<span class="str">$col</span>  = (<span class="str">$data</span>[0].PSObject.Properties.Name) |
+         Where-Object { <span class="str">$_</span> -match <span class="str">'server|host|name'</span> } |
+         Select-Object -First 1
+<span class="str">$res</span> = @()
+<span class="str">$i</span>   = 0
+<span class="kw">foreach</span> (<span class="str">$r</span> <span class="kw">in</span> <span class="str">$data</span>) {
+    <span class="str">$i</span>++
+    <span class="str">$h</span> = (<span class="str">$r</span>.<span class="str">$col</span> -split <span class="str">'[.\s]'</span>)[0].ToLower().Trim()
+    Write-Progress -Activity <span class="str">"Pinging"</span> -Status <span class="str">"$i / $($data.Count) : $h"</span> -PercentComplete (<span class="str">$i</span> / <span class="str">$data</span>.Count * 100)
+    <span class="str">$st</span> = <span class="str">"Unreachable"</span>
+    <span class="str">$ms</span> = <span class="str">""</span>
+    <span class="kw">try</span> {
+        <span class="str">$ping</span>  = New-Object System.Net.NetworkInformation.Ping
+        <span class="str">$reply</span> = <span class="str">$ping</span>.Send(<span class="str">$h</span>, <span class="str">$Timeout</span>)
+        <span class="kw">if</span> (<span class="str">$reply</span>.Status -eq <span class="str">"Success"</span>) { <span class="str">$st</span> = <span class="str">"Reachable"</span>; <span class="str">$ms</span> = <span class="str">$reply</span>.RoundtripTime }
+    } <span class="kw">catch</span> { <span class="str">$st</span> = <span class="str">"Error"</span> }
+    <span class="str">$res</span> += [PSCustomObject]@{
+        ShortServerName = <span class="str">$h</span>
+        OriginalName    = <span class="str">$r</span>.<span class="str">$col</span>
+        PingStatus      = <span class="str">$st</span>
+        LatencyMs       = <span class="str">$ms</span>
+        CheckedAt       = (Get-Date -Format <span class="str">"yyyy-MM-dd HH:mm"</span>)
+    }
+}
+<span class="str">$res</span> | Export-Csv <span class="str">$Out</span> -NoTypeInformation -Encoding UTF8
+Write-Host <span class="str">"Done: $Out"</span> -ForegroundColor Green</div>
+  <p style="font-size:12px;color:#555;">
+    First run: <code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser</code><br>
+    Then: <code>.\ping_servers.ps1</code> &nbsp;or&nbsp; <code>.\ping_servers.ps1 -In "myfile.csv"</code>
+  </p>
+</div>
+
+<div class="author-footer">
+  <span>&#128736;</span>
+  <span>
+    <span class="af-label">Developed by:</span> Senthil Kumar Giritharan &nbsp;|&nbsp;
+    <span class="af-label">Powered by:</span> Claude (Anthropic) &nbsp;|&nbsp;
+    <img src="data:image/jpeg;base64,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" alt="Allianz" style="height:18px;vertical-align:middle;margin:0 4px 0 2px;border-radius:2px;">
+    <span class="af-label">Allianz Technologies</span> &nbsp;|&nbsp;
+    Customer Success – Linux &amp; AIX | Hybrid Cloud Enablement
+  </span>
+</div>
+
+<script>
+// ── HC Managed TSG groups ─────────────────────────────────────────────
+var HC_MANAGED_TSG = [
+  "A.TEC.GLOB.HC.APAC.LINUX",
+  "A.TEC.GLOB.HC.LINUX",
+  "AZTEC.AU.LINUX",
+  "A.TEC.GLOB.ITSM.HMO.OS-LINUX"
+];
+
+function isHCManagedTSG(tsg) {
+  if (!tsg || tsg.trim() === "") return true;
+  var t = tsg.trim().toUpperCase();
+  for (var i = 0; i < HC_MANAGED_TSG.length; i++) {
+    if (t === HC_MANAGED_TSG[i].toUpperCase()) return true;
+  }
+  return false;
+}
+
+// ── Global state ──────────────────────────────────────────────────────
+var dtRaw=[],cmdbRaw=[],pingRaw=[],rows=[],sel={},curPage=1,pgSize=100;
+
+var CATS=[
+  "Available in SLA Threshold limit","Newly Built Server","Retired/Decommission",
+  "DR Server / In Maintenance","Customer Powered Off","Patching Reboot","Customer Reboot",
+  "Check Manually","Duplicate - Check Manually",
+  "CMDB Data Not Found / Failed Server Build","HC Linux not managed","Other"
+];
+
+var CCOL={
+  "Available in SLA Threshold limit":"#198754","Newly Built Server":"#20c997",
+  "Retired/Decommission":"#7F77DD","DR Server / In Maintenance":"#1a56a0",
+  "Customer Powered Off":"#E24B4A","Patching Reboot":"#378ADD","Customer Reboot":"#1D9E75",
+  "Check Manually":"#EF9F27","Duplicate - Check Manually":"#d63384",
+  "CMDB Data Not Found / Failed Server Build":"#c0392b",
+  "HC Linux not managed":"#7a1010","Other":"#888780","Uncategorized":"#ccc"
+};
+
+// ── Utilities ─────────────────────────────────────────────────────────
+function trimHost(s){return String(s||"").toLowerCase().split(".")[0].replace(/\s/g,"");}
+function trimStr(s){return String(s||"").replace(/^\s+|\s+$/g,"");}
+function lc(s){return trimStr(s).toLowerCase();}
+function fmtPct(v){var n=parseFloat(v);return isNaN(n)?"N/A":n.toFixed(4)+"%";}
+function avCls(v){var n=parseFloat(v);if(isNaN(n))return"avwn";if(n>=99.95)return"avok";if(n>=5)return"avwn";return"aver";}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
+function parseDate(val){
+  if(!val||val==="")return null;
+  var s=trimStr(String(val)),d=new Date(s);
+  if(!isNaN(d.getTime()))return d;
+  var m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+  if(m){d=new Date(parseInt(m[3]),parseInt(m[2])-1,parseInt(m[1]));if(!isNaN(d.getTime()))return d;}
+  return null;
+}
+function formatDate(val){
+  if(!val||val==="")return"";
+  var d=parseDate(val);if(!d)return trimStr(String(val));
+  return("0"+d.getDate()).slice(-2)+"/"+("0"+(d.getMonth()+1)).slice(-2)+"/"+d.getFullYear();
+}
+
+// ── Tab navigation ────────────────────────────────────────────────────
+function showTab(t){
+  var tabs=["upload","review","summary","psguide"];
+  for(var i=0;i<tabs.length;i++){
+    document.getElementById("sec-"+tabs[i]).className="sec"+(tabs[i]===t?" on":"");
+    document.querySelectorAll(".tab")[i].className="tab"+(tabs[i]===t?" active":"");
+  }
+  if(t==="summary")renderSummary();
+}
+function setProg(pct,lbl,stat,color){
+  var bar=document.getElementById("pbar");
+  bar.style.width=pct+"%";bar.style.background=color||"#3b5bdb";
+  document.getElementById("plbl").textContent=lbl;
+  document.getElementById("pstat").textContent=stat;
+}
+
+// ── File loading ──────────────────────────────────────────────────────
+function loadFile(e,type){
+  var file=e.target.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      var wb=XLSX.read(ev.target.result,{type:"array"});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      var data=XLSX.utils.sheet_to_json(ws,{defval:"",raw:false});
+      if(!data.length){alert("No data found in file.");return;}
+      var cols=Object.keys(data[0]);
+      if(type==="dt"){
+        dtRaw=data;
+        document.getElementById("dt-st").innerHTML="<span class='badge b-ok'>"+data.length+" rows loaded</span>";
+        popSel("map-name",cols,function(c){var l=lc(c);return l==="servername"||l==="server name"||l.indexOf("server")>=0;});
+        popSel("map-avail",cols,function(c){var l=lc(c);return l==="host availability %"||l.indexOf("avail")>=0||(l.indexOf("%")>=0&&l.indexOf("host")>=0);});
+        document.getElementById("dt-map").style.display="flex";
+      }else if(type==="cmdb"){
+        cmdbRaw=data;
+        document.getElementById("cmdb-st").innerHTML="<span class='badge b-ok'>"+data.length+" rows loaded</span>";
+        popSel("map-ch",cols,function(c){var l=lc(c);return l==="name"||l==="server name"||l.indexOf("host")>=0;});
+        popSel("map-cs",cols,function(c){var l=lc(c);return l==="install status"||l==="installstatus";});
+        popSel("map-uf",cols,function(c){var l=lc(c);return l==="used for"||l==="usedfor"||l==="usage"||l==="environment";});
+        popSel("map-tsg",cols,function(c){var l=lc(c);return l==="technical support group"||l==="technicalsupportgroup"||l.indexOf("tsg")>=0||l.indexOf("support group")>=0;});
+        popSel("map-cc",cols,function(c){return lc(c)==="created";});
+        popSel("map-rd",cols,function(c){var l=lc(c);return l==="retired date"||l==="retireddate"||l==="retirement date"||l==="decommission date";});
+        popSel("map-co",cols,function(c){var l=lc(c);return l==="owned by"||l==="owner";});
+        document.getElementById("cmdb-map").style.display="flex";
+      }else{
+        pingRaw=data;
+        document.getElementById("ping-st").innerHTML="<span class='badge b-ok'>"+data.length+" rows loaded</span>";
+        popSel("map-ph",cols,function(c){var l=lc(c);return l==="shortservername"||l.indexOf("short")>=0||l.indexOf("host")>=0;});
+        popSel("map-ps",cols,function(c){var l=lc(c);return l==="pingstatus"||l.indexOf("ping")>=0;});
+        document.getElementById("ping-map").style.display="flex";
+      }
+    }catch(err){alert("Error reading file: "+err.message);}
+  };
+  reader.onerror=function(){alert("Failed to read file.");};
+  reader.readAsArrayBuffer(file);
+}
+
+function popSel(id,cols,preferFn){
+  var el=document.getElementById(id);if(!el)return;
+  el.innerHTML="";var best=-1;
+  for(var i=0;i<cols.length;i++){
+    var o=document.createElement("option");o.value=cols[i];o.textContent=cols[i];el.appendChild(o);
+    if(best<0&&preferFn(cols[i]))best=i;
+  }
+  if(best>=0)el.selectedIndex=best;
+}
+
+function getColVal(row,colName){
+  if(row[colName]!==undefined)return row[colName];
+  var target=lc(colName),keys=Object.keys(row);
+  for(var i=0;i<keys.length;i++){if(lc(keys[i])===target)return row[keys[i]];}
+  return"";
+}
+
+// ── Build CMDB map ────────────────────────────────────────────────────
+function buildCmdbMap(){
+  var hc=document.getElementById("map-ch")?document.getElementById("map-ch").value:"";
+  var sc=document.getElementById("map-cs")?document.getElementById("map-cs").value:"";
+  var ufc=document.getElementById("map-uf")?document.getElementById("map-uf").value:"";
+  var tgc=document.getElementById("map-tsg")?document.getElementById("map-tsg").value:"";
+  var cc=document.getElementById("map-cc")?document.getElementById("map-cc").value:"";
+  var rdc=document.getElementById("map-rd")?document.getElementById("map-rd").value:"";
+  var oc=document.getElementById("map-co")?document.getElementById("map-co").value:"";
+  var now=new Date(),ago=new Date(now.getFullYear(),now.getMonth()-1,now.getDate());
+  var map={};
+  for(var i=0;i<cmdbRaw.length;i++){
+    var r=cmdbRaw[i],k=trimHost(getColVal(r,hc));if(!k)continue;
+    var crRaw=getColVal(r,cc),rdRaw=getColVal(r,rdc),crDate=parseDate(crRaw);
+    map[k]={
+      status:lc(getColVal(r,sc)),usedFor:trimStr(getColVal(r,ufc)),
+      tsg:trimStr(getColVal(r,tgc)),owner:trimStr(getColVal(r,oc)),
+      isNew:(crDate!==null&&crDate>=ago),
+      createdFmt:formatDate(crRaw),retiredDateFmt:formatDate(rdRaw)
+    };
+  }
+  return map;
+}
+
+function buildPingMap(){
+  var hc=document.getElementById("map-ph")?document.getElementById("map-ph").value:"";
+  var sc=document.getElementById("map-ps")?document.getElementById("map-ps").value:"";
+  var map={};
+  for(var i=0;i<pingRaw.length;i++){var k=trimHost(getColVal(pingRaw[i],hc));if(!k)continue;map[k]=lc(getColVal(pingRaw[i],sc));}
+  return map;
+}
+
+function getThresholds(){
+  return{
+    prodSLA:parseFloat(document.getElementById("prod-sla").value)||99.95,
+    prodPatchLo:parseFloat(document.getElementById("prod-patch-lo").value)||90,
+    prodLowCat:document.getElementById("prod-low-cat").value||"Check Manually",
+    nonpSLA:parseFloat(document.getElementById("nonp-sla").value)||95,
+    nonpPatchLo:parseFloat(document.getElementById("nonp-patch-lo").value)||90,
+    nonpLowCat:document.getElementById("nonp-low-cat").value||"Check Manually"
+  };
+}
+
+// ── Auto-categorization (single row, no dup logic here) ───────────────
+function autoCategory(sn,availRaw,cmdbMap,pingMap,T,retKw,mntKw,prodKw,drKw){
+  var p=parseFloat(availRaw);
+  var entry=cmdbMap[sn]||null;
+  if(!entry)return"CMDB Data Not Found / Failed Server Build";
+  var st=entry.status||"",isNew=entry.isNew||false;
+  var usedFor=trimStr(entry.usedFor||""),tsg=trimStr(entry.tsg||""),owner=trimStr(entry.owner||"");
+  var isDR=usedFor.toLowerCase().indexOf(drKw.toLowerCase())>=0;
+  var isProd=!isDR&&usedFor.toLowerCase().indexOf(prodKw.toLowerCase())>=0;
+  var ping=pingMap[sn]||"";
+  if(st.indexOf("install")>=0&&(!usedFor||!owner))return"CMDB Data Not Found / Failed Server Build";
+  var slaThresh=isProd?T.prodSLA:T.nonpSLA;
+  var patchLo=isProd?T.prodPatchLo:T.nonpPatchLo;
+  var lowCat=isProd?T.prodLowCat:T.nonpLowCat;
+  if(st&&st.indexOf(retKw)>=0)return"Retired/Decommission";
+  if(tsg&&!isHCManagedTSG(tsg))return"HC Linux not managed";
+  if(!isNaN(p)&&p>=slaThresh)return"Available in SLA Threshold limit";
+  if(isDR)return"DR Server / In Maintenance";
+  if(st&&st.indexOf(mntKw)>=0)return"Customer Powered Off";
+  if(isNew)return"Newly Built Server";
+  if(!st||st==="")return"CMDB Data Not Found / Failed Server Build";
+  if(!isNaN(p)&&p>=patchLo&&p<slaThresh){
+    if(ping&&ping.indexOf("reachable")>=0&&ping.indexOf("unreachable")===-1)return"Check Manually";
+    return"Patching Reboot";
+  }
+  if(!isNaN(p)&&p<patchLo)return lowCat;
+  return"Check Manually";
+}
+
+// ── KEY: Post-process duplicates ──────────────────────────────────────
+// After all rows are categorized, find short names that appear >1 time.
+// Among each group, keep the highest availability row's category unchanged.
+// All others → "Duplicate - Check Manually" with note showing all avail values.
+// Then SORT so all members of a dup group are adjacent.
+function processDuplicates(rowList){
+  // Group by shortName
+  var groups={};
+  for(var i=0;i<rowList.length;i++){
+    var sn=rowList[i].shortName;
+    if(!groups[sn])groups[sn]=[];
+    groups[sn].push(i);
+  }
+
+  // Process groups with >1 member
+  for(var sn in groups){
+    var idxs=groups[sn];
+    if(idxs.length<2)continue;
+
+    // Find index of highest availability
+    var bestIdx=idxs[0];
+    for(var j=1;j<idxs.length;j++){
+      var a=parseFloat(rowList[idxs[j]].availRaw);
+      var b=parseFloat(rowList[bestIdx].availRaw);
+      if(!isNaN(a)&&(isNaN(b)||a>b))bestIdx=idxs[j];
+    }
+
+    // Build avail summary string for notes
+    var availSummary=idxs.map(function(k){return rowList[k].rawName+" ("+fmtPct(rowList[k].availRaw)+")";}).join(" | ");
+
+    // Mark all non-best as Duplicate
+    for(var j=0;j<idxs.length;j++){
+      var r=rowList[idxs[j]];
+      r.dupGroup=sn;
+      r.dupCount=idxs.length;
+      if(idxs[j]!==bestIdx){
+        r.category="Duplicate - Check Manually";
+        r.notes="Dup group: "+availSummary;
+        r.isDupNonBest=true;
+      }else{
+        // Best entry: keep category, add note
+        r.notes="Highest avail in dup group: "+availSummary;
+        r.isDupBest=true;
+      }
+    }
+  }
+
+  // Sort: non-dup rows stay in place; dup groups are moved together
+  // Strategy: stable sort — dup groups bubble together by shortName,
+  // within each group best row first then others by descending avail.
+  rowList.sort(function(a,b){
+    // Both in same dup group → sort within group (best first)
+    if(a.dupGroup&&b.dupGroup&&a.dupGroup===b.dupGroup){
+      if(a.isDupBest)return-1;
+      if(b.isDupBest)return 1;
+      var av=parseFloat(b.availRaw)-parseFloat(a.availRaw);
+      return isNaN(av)?0:av;
+    }
+    // One in dup group, other not → dup groups float but keep relative non-dup order
+    // We preserve original order for non-dup rows; dup groups stay at their best-entry position
+    if(a.dupGroup&&!b.dupGroup)return 0;
+    if(!a.dupGroup&&b.dupGroup)return 0;
+    // Both in different dup groups or both non-dup → preserve original id order
+    return a.id-b.id;
+  });
+
+  // Second pass: proper stable grouping — extract dup groups and reinsert
+  var nonDupRows=[],dupGroupMap={};
+  for(var i=0;i<rowList.length;i++){
+    var r=rowList[i];
+    if(r.dupGroup){
+      if(!dupGroupMap[r.dupGroup])dupGroupMap[r.dupGroup]={insertAfter:i,rows:[]};
+      dupGroupMap[r.dupGroup].rows.push(r);
+    }else{
+      nonDupRows.push(r);
+    }
+  }
+
+  // Find insertion points in non-dup rows based on best entry's original id
+  var result=[];
+  var inserted={};
+  for(var i=0;i<nonDupRows.length;i++){
+    result.push(nonDupRows[i]);
+    // After each non-dup row, check if any dup group's best entry originally sat near here
+    for(var grp in dupGroupMap){
+      if(inserted[grp])continue;
+      var grpRows=dupGroupMap[grp].rows;
+      var bestRow=null;
+      for(var j=0;j<grpRows.length;j++){if(grpRows[j].isDupBest){bestRow=grpRows[j];break;}}
+      if(!bestRow)bestRow=grpRows[0];
+      // Insert dup group after the non-dup row whose id is just <= best row's original id
+      if(bestRow.id<=nonDupRows[i].id){
+        // Sort group: best first, then descending avail
+        grpRows.sort(function(a,b){
+          if(a.isDupBest)return-1;if(b.isDupBest)return 1;
+          return parseFloat(b.availRaw)-parseFloat(a.availRaw);
+        });
+        for(var j=0;j<grpRows.length;j++)result.push(grpRows[j]);
+        inserted[grp]=true;
+      }
+    }
+  }
+  // Append any remaining dup groups not yet inserted
+  for(var grp in dupGroupMap){
+    if(!inserted[grp]){
+      var grpRows=dupGroupMap[grp].rows;
+      grpRows.sort(function(a,b){if(a.isDupBest)return-1;if(b.isDupBest)return 1;return parseFloat(b.availRaw)-parseFloat(a.availRaw);});
+      for(var j=0;j<grpRows.length;j++)result.push(grpRows[j]);
+    }
+  }
+
+  return result;
+}
+
+// ── Main process ──────────────────────────────────────────────────────
+function startProcess(){
+  if(!dtRaw.length){alert("Please upload the Dynatrace file first.");return;}
+  var btn=document.getElementById("proc-btn");
+  btn.disabled=true;btn.textContent="Processing...";
+  setProg(2,"Starting...","Step 1: Building CMDB map...");
+  setTimeout(function(){
+    var cmdbMap={};try{cmdbMap=buildCmdbMap();}catch(e){console.warn(e);}
+    setProg(12,"Step 2...","Step 2: Building ping map...");
+    setTimeout(function(){
+      var pingMap={};try{pingMap=buildPingMap();}catch(e){console.warn(e);}
+      var T=getThresholds();
+      var retKw=lc(document.getElementById("kw-ret").value);
+      var mntKw=lc(document.getElementById("kw-mnt").value);
+      var prodKw=trimStr(document.getElementById("kw-prod").value);
+      var drKw=trimStr(document.getElementById("kw-dr").value);
+      var nCol=document.getElementById("map-name").value;
+      var aCol=document.getElementById("map-avail").value;
+      setProg(18,"0 / "+dtRaw.length,"Step 3: Categorizing rows...");
+      var newRows=[],total=dtRaw.length,CHUNK=300,idx=0;
+      setTimeout(function tick(){
+        var end=Math.min(idx+CHUNK,total);
+        for(var i=idx;i<end;i++){
+          var r=dtRaw[i],raw=trimStr(String(r[nCol]||""));
+          if(!raw)continue;
+          var sn=trimHost(raw),av=parseFloat(r[aCol]);
+          var e2=cmdbMap[sn]||null;
+          var uf=e2?String(e2.usedFor||""):"";
+          var tsg=e2?String(e2.tsg||""):"";
+          var isDR=uf.toLowerCase().indexOf(drKw.toLowerCase())>=0;
+          var isProd=!isDR&&uf.toLowerCase().indexOf(prodKw.toLowerCase())>=0;
+          var cat="";
+          try{cat=autoCategory(sn,av,cmdbMap,pingMap,T,retKw,mntKw,prodKw,drKw);}catch(ex){cat="Check Manually";}
+          newRows.push({
+            id:i,rawName:raw,shortName:sn,availRaw:av,
+            isProd:isProd,isDR:isDR,usedFor:uf,tsg:tsg,
+            cmdbStatus:e2?String(e2.status||""):null,
+            cmdbIsNew:e2?!!e2.isNew:false,
+            cmdbCreatedFmt:e2?String(e2.createdFmt||""):"",
+            cmdbRetiredDate:e2?String(e2.retiredDateFmt||""):"",
+            cmdbOwner:e2?String(e2.owner||""):"",
+            pingStatus:pingMap[sn]!==undefined?pingMap[sn]:null,
+            category:cat,notes:"",
+            dupGroup:null,dupCount:1,isDupBest:false,isDupNonBest:false
+          });
+        }
+        idx=end;
+        var pct=Math.round(18+(idx/total)*78);
+        setProg(pct,idx+" / "+total+" rows","Categorized "+newRows.length+" servers...");
+        if(idx<total){setTimeout(tick,0);}
+        else{
+          setProg(95,total+" rows","Step 4: Processing duplicates...");
+          // ── POST-PROCESS DUPLICATES ──
+          newRows=processDuplicates(newRows);
+          rows=newRows;sel={};
+          setProg(100,total+" / "+total+" rows","Done! "+rows.length+" servers processed.","#198754");
+          btn.disabled=false;btn.textContent="Re-process \u2192";
+          populateOwnerFilter();curPage=1;renderTable();showTab("review");
+        }
+      },0);
+    },0);
+  },0);
+}
+
+// ── Owner filter ──────────────────────────────────────────────────────
+function populateOwnerFilter(){
+  var owners={};
+  for(var i=0;i<rows.length;i++){if(rows[i].cmdbOwner)owners[rows[i].cmdbOwner]=true;}
+  var s=document.getElementById("fo");s.innerHTML="<option value=''>All owners</option>";
+  Object.keys(owners).sort().forEach(function(k){var o=document.createElement("option");o.value=k;o.textContent=k;s.appendChild(o);});
+}
+
+// ── Filtering ─────────────────────────────────────────────────────────
+function getFiltered(){
+  var q=lc(document.getElementById("ft").value||"");
+  var cat=document.getElementById("fc").value;
+  var own=document.getElementById("fo").value;
+  var env=document.getElementById("fenv").value;
+  var res=[];
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    var mq=!q||r.shortName.indexOf(q)>=0||r.rawName.toLowerCase().indexOf(q)>=0||
+      (r.category||"").toLowerCase().indexOf(q)>=0||
+      (r.cmdbOwner||"").toLowerCase().indexOf(q)>=0||
+      (r.tsg||"").toLowerCase().indexOf(q)>=0;
+    var mc=!cat||
+      (cat==="__blank__"?!r.category:false)||
+      (cat==="__manual__"?r.category==="Check Manually":false)||
+      (cat==="__sla__"?r.category==="Available in SLA Threshold limit":false)||
+      (cat==="__nocmdb__"?r.category==="CMDB Data Not Found / Failed Server Build":false)||
+      (cat==="__dr__"?r.category==="DR Server / In Maintenance":false)||
+      (cat==="__hcnm__"?r.category==="HC Linux not managed":false)||
+      (cat==="__dup__"?!!r.dupGroup:false)||
+      r.category===cat;
+    var mo=!own||r.cmdbOwner===own;
+    var me=!env||(env==="prod"?r.isProd:false)||(env==="nonp"?(!r.isProd&&!r.isDR):false)||(env==="dr"?r.isDR:false);
+    if(mq&&mc&&mo&&me)res.push(r);
+  }
+  return res;
+}
+
+// ── Badges ────────────────────────────────────────────────────────────
+function cmdbBadge(r){
+  var st=r.cmdbStatus;
+  var retKw=lc(document.getElementById("kw-ret").value);
+  var mntKw=lc(document.getElementById("kw-mnt").value);
+  var newTag=r.cmdbIsNew?" <span class='badge b-new'>new</span>"+(r.cmdbCreatedFmt?" <small style='color:#0d6e4a;'>(built "+esc(r.cmdbCreatedFmt)+")</small>":""):"";
+  var retTag=r.cmdbRetiredDate?" <small style='color:#4a3fa0;'>(retired "+esc(r.cmdbRetiredDate)+")</small>":"";
+  if(st===null)return"<span style='color:#c0392b;font-size:11px;font-weight:700;'>Not in CMDB</span>";
+  if(st==="")return"<span class='badge b-blank'>blank</span>";
+  if(st.indexOf(retKw)>=0)return"<span class='badge b-ret'>"+esc(st)+"</span>"+retTag+newTag;
+  if(st.indexOf(mntKw)>=0)return"<span class='badge b-mnt'>"+esc(st)+"</span>"+newTag;
+  return"<span class='badge b-act'>"+esc(st)+"</span>"+newTag;
+}
+function tsgBadge(tsg){
+  if(!tsg)return"<span style='color:#bbb;'>&#8212;</span>";
+  if(!isHCManagedTSG(tsg))return"<span class='badge b-hcnm' title='"+esc(tsg)+"'>&#9888; "+esc(tsg.length>22?tsg.substring(0,20)+"...":tsg)+"</span>";
+  return"<span style='font-size:11px;color:#155724;' title='"+esc(tsg)+"'>"+esc(tsg.length>22?tsg.substring(0,20)+"...":tsg)+"</span>";
+}
+function pingBadge(st){
+  if(!st)return"<span class='badge b-pna'>No data</span>";
+  if(st.indexOf("unreachable")>=0||st==="error")return"<span class='badge b-pdn'>Unreachable</span>";
+  if(st.indexOf("reachable")>=0)return"<span class='badge b-pup'>Reachable</span>";
+  return"<span class='badge b-pna'>"+esc(st)+"</span>";
+}
+function envBadge(r){
+  if(!r.usedFor)return"<span class='badge b-pna'>?</span>";
+  if(r.isDR)return"<span class='badge' style='background:#dbeafe;color:#1a56a0;'>DR</span>";
+  return r.isProd?"<span class='badge b-prod'>Prod</span>":"<span class='badge b-nonp'>Non-Prod</span>";
+}
+
+// ── Render table ──────────────────────────────────────────────────────
+function renderTable(){
+  var unc=0,man=0;
+  for(var i=0;i<rows.length;i++){if(!rows[i].category)unc++;if(rows[i].category==="Check Manually")man++;}
+  var ban=document.getElementById("rev-ban");
+  if(unc+man>0){ban.className="banner ban-w";ban.textContent=man+" flagged Check Manually, "+unc+" uncategorized.";}
+  else{ban.className="banner ban-ok";ban.textContent="All servers categorized. Ready to export.";}
+  var scnt=0;for(var k in sel){if(sel[k])scnt++;}
+  document.getElementById("sel-cnt").textContent="("+scnt+" selected)";
+
+  var filt=getFiltered(),total=filt.length;
+  var totPg=Math.max(1,Math.ceil(total/pgSize));
+  if(curPage>totPg)curPage=totPg;
+  var s=(curPage-1)*pgSize,e=Math.min(s+pgSize,total),page=filt.slice(s,e);
+
+  var html="";
+  for(var i=0;i<page.length;i++){
+    var r=page[i],isSel=!!sel[r.id];
+    // Row styling: dup groups get pink border treatment
+    var rc="";
+    if(isSel){rc="rsel";}
+    else if(r.dupGroup){
+      // Determine position in dup group for border styling
+      var isFirst=(i===0||!page[i-1].dupGroup||page[i-1].dupGroup!==r.dupGroup);
+      var isLast=(i===page.length-1||!page[i+1].dupGroup||page[i+1].dupGroup!==r.dupGroup);
+      if(isFirst&&isLast)rc="rdup";
+      else if(isFirst)rc="rdup-first";
+      else if(isLast)rc="rdup-last";
+      else rc="rdup";
+    }
+    else if(r.category==="Check Manually"||r.category==="CMDB Data Not Found / Failed Server Build"||r.category==="HC Linux not managed"||!r.category){
+      rc="runc";
+    }
+
+    var opts="<option value=''>-- select --</option>";
+    for(var j=0;j<CATS.length;j++){
+      opts+="<option value='"+esc(CATS[j])+"'"+(r.category===CATS[j]?" selected":"")+">"+esc(CATS[j])+"</option>";
+    }
+
+    // Short name cell — show dup group indicator
+    var snCell=esc(r.shortName);
+    if(r.dupGroup){
+      var icon=r.isDupBest?"&#128258;":"&#128259;";
+      var lbl=r.isDupBest?"Best ("+fmtPct(r.availRaw)+")":"Dup "+(r.isDupNonBest?fmtPct(r.availRaw):"");
+      snCell+=" <span class='badge b-dup' title='Duplicate group: "+esc(r.dupGroup)+"'>"+icon+" "+esc(lbl)+"</span>";
+    }
+
+    html+="<tr class='"+rc+"'>";
+    html+="<td><input type='checkbox'"+(isSel?" checked":"")+" onchange='toggleRow("+r.id+",this.checked)'></td>";
+    html+="<td style='font-family:monospace;font-size:11px;white-space:nowrap;'>"+snCell+"</td>";
+    html+="<td style='font-family:monospace;font-size:11px;color:#666;word-break:break-all;max-width:160px;'>"+esc(r.rawName)+"</td>";
+    html+="<td class='"+avCls(r.availRaw)+"' style='white-space:nowrap;'>"+fmtPct(r.availRaw)+"</td>";
+    html+="<td>"+envBadge(r)+"</td>";
+    html+="<td>"+cmdbBadge(r)+"</td>";
+    html+="<td style='font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;' title='"+esc(r.cmdbOwner||"")+"'>"+(r.cmdbOwner?esc(r.cmdbOwner):"<span style='color:#bbb;'>&#8212;</span>")+"</td>";
+    html+="<td style='max-width:150px;'>"+tsgBadge(r.tsg)+"</td>";
+    html+="<td>"+pingBadge(r.pingStatus)+"</td>";
+    html+="<td><select onchange='updateRow("+r.id+",\"category\",this.value)'>"+opts+"</select></td>";
+    html+="<td><input type='text' value='"+esc(r.notes||"")+"' placeholder='notes' onchange='updateRow("+r.id+",\"notes\",this.value)'></td>";
+    html+="</tr>";
+  }
+  if(!html)html="<tr><td colspan='11' style='text-align:center;padding:20px;color:#888;'>No matching rows</td></tr>";
+  document.getElementById("tbl").innerHTML=html;
+
+  // Pagination
+  var pg="<div style='display:flex;align-items:center;gap:6px;margin-top:10px;font-size:12px;flex-wrap:wrap;'>";
+  pg+="<span style='color:#555;'>"+total+" servers";
+  if(total>pgSize)pg+=" | Showing "+(s+1)+"&ndash;"+e;
+  pg+="</span>";
+  if(totPg>1){
+    pg+="<button class='btnsm' onclick='goPage("+(curPage-1)+")' "+(curPage<=1?"disabled":"")+">&#8592; Prev</button>";
+    for(var p2=1;p2<=totPg;p2++){
+      if(p2===1||p2===totPg||(p2>=curPage-2&&p2<=curPage+2)){
+        pg+="<button class='btnsm' onclick='goPage("+p2+")' style='"+(p2===curPage?"background:#3b5bdb;color:#fff;border-color:#3b5bdb;":"")+">"+p2+"</button>";
+      }else if(p2===curPage-3||p2===curPage+3){pg+="<span style='color:#aaa;'>&#8230;</span>";}
+    }
+    pg+="<button class='btnsm' onclick='goPage("+(curPage+1)+")' "+(curPage>=totPg?"disabled":"")+">Next &#8594;</button>";
+    pg+="<select class='smsel' onchange='chgPgSz(this.value)'>";
+    [50,100,200,500].forEach(function(n){pg+="<option value='"+n+"'"+(pgSize===n?" selected":"")+">"+n+" / page</option>";});
+    pg+="</select>";
+  }
+  pg+="</div>";
+  document.getElementById("pgn").innerHTML=pg;
+}
+
+function goPage(p){var f=getFiltered();var maxP=Math.max(1,Math.ceil(f.length/pgSize));curPage=Math.max(1,Math.min(p,maxP));renderTable();}
+function chgPgSz(n){pgSize=parseInt(n);curPage=1;renderTable();}
+
+function updateRow(id,field,val){
+  for(var i=0;i<rows.length;i++){if(rows[i].id===id){rows[i][field]=val;break;}}
+  var unc=0,man=0;
+  for(var i=0;i<rows.length;i++){if(!rows[i].category)unc++;if(rows[i].category==="Check Manually")man++;}
+  var ban=document.getElementById("rev-ban");
+  if(unc+man>0){ban.className="banner ban-w";ban.textContent=man+" flagged Check Manually, "+unc+" uncategorized.";}
+  else{ban.className="banner ban-ok";ban.textContent="All servers categorized. Ready to export.";}
+}
+
+function toggleRow(id,v){sel[id]=v;var c=0;for(var k in sel){if(sel[k])c++;}document.getElementById("sel-cnt").textContent="("+c+" selected)";}
+function toggleAll(v){var f=getFiltered();for(var i=0;i<f.length;i++)sel[f[i].id]=v;renderTable();}
+function selAllVis(){toggleAll(true);}
+function deselAll(){sel={};renderTable();}
+
+function applyBulk(){
+  var cat=document.getElementById("bulk-cat").value;
+  var note=document.getElementById("bulk-note").value;
+  if(!cat){alert("Select a category.");return;}
+  var ids=[];for(var k in sel){if(sel[k])ids.push(parseInt(k));}
+  if(!ids.length){alert("Check at least one row.");return;}
+  for(var i=0;i<rows.length;i++){for(var j=0;j<ids.length;j++){if(rows[i].id===ids[j]){rows[i].category=cat;if(note)rows[i].notes=note;}}}
+  sel={};document.getElementById("bulk-cat").value="";document.getElementById("bulk-note").value="";renderTable();
+}
+
+// ── Summary ───────────────────────────────────────────────────────────
+function renderSummary(){
+  if(!rows.length){document.getElementById("sum-body").innerHTML="<p style='color:#888;'>Process data first.</p>";return;}
+  var sm={},prod=0,nonp=0;
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i],k=r.category||"Uncategorized";
+    sm[k]=(sm[k]||0)+1;
+    if(r.isProd)prod++;else nonp++;
+  }
+  var total=rows.length;
+  var man=sm["Check Manually"]||0;
+  var hcnm=sm["HC Linux not managed"]||0;
+  var dups=sm["Duplicate - Check Manually"]||0;
+
+  var html="<div class='metrics'>";
+  html+="<div class='mc'><div class='lb'>Total servers</div><div class='vl'>"+total+"</div></div>";
+  html+="<div class='mc'><div class='lb'>Production</div><div class='vl' style='color:#856404'>"+prod+"</div></div>";
+  html+="<div class='mc'><div class='lb'>Non-Production</div><div class='vl' style='color:#1a56a0'>"+nonp+"</div></div>";
+  html+="<div class='mc'><div class='lb'>Duplicates</div><div class='vl' style='color:#d63384'>"+dups+"</div></div>";
+  html+="<div class='mc'><div class='lb'>HC Linux not managed</div><div class='vl' style='color:#7a1010'>"+hcnm+"</div></div>";
+  html+="</div>";
+  html+="<p style='font-weight:700;margin-bottom:12px;'>Breakdown by category</p>";
+  var keys=Object.keys(sm).sort(function(a,b){return sm[b]-sm[a];});
+  for(var i=0;i<keys.length;i++){
+    var k=keys[i],cnt=sm[k],p=Math.round(cnt/total*100),col=CCOL[k]||"#888";
+    html+="<div class='brow'><span class='blbl'>"+esc(k)+"</span>";
+    html+="<div class='btrk'><div class='bfil' style='width:"+p+"%;background:"+col+"'></div></div>";
+    html+="<span class='bcnt'>"+cnt+" ("+p+"%)</span></div>";
+  }
+  html+="<div style='margin-top:20px;display:flex;gap:10px;'>";
+  html+="<button class='btnp' onclick='exportXLSX()'>&#11015; Export Excel (.xlsx)</button>";
+  html+="<button class='btns' onclick='showTab(\"review\")'>Back to Review</button></div>";
+  document.getElementById("sum-body").innerHTML=html;
+}
+
+// ── Export ────────────────────────────────────────────────────────────
+function exportXLSX(){
+  if(!rows.length){alert("No data to export.");return;}
+  var data=[];
+  for(var i=0;i<rows.length;i++){
+    var r=rows[i];
+    data.push({
+      "Short Server Name":r.shortName,
+      "Original Server Name":r.rawName,
+      "Host Availability %":fmtPct(r.availRaw),
+      "Environment":r.isProd?"Production":"Non-Production",
+      "Used For":r.usedFor||"",
+      "Technical Support Group":r.tsg||"",
+      "CMDB Install Status":r.cmdbStatus!==null?r.cmdbStatus:"Not in CMDB",
+      "CMDB Created Date":r.cmdbCreatedFmt||"",
+      "Retired Date":r.cmdbRetiredDate||"",
+      "Newly Built":r.cmdbIsNew?"Yes":"No",
+      "Owned By":r.cmdbOwner||"",
+      "Ping Status":r.pingStatus||"Not checked",
+      "Duplicate Group":r.dupGroup||"",
+      "Category":r.category||"Uncategorized",
+      "Notes":r.notes||""
+    });
+  }
+  var ws=XLSX.utils.json_to_sheet(data);
+  ws["!cols"]=[{wch:20},{wch:46},{wch:20},{wch:16},{wch:18},{wch:32},{wch:20},{wch:18},{wch:16},{wch:12},{wch:24},{wch:16},{wch:20},{wch:36},{wch:40}];
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Availability Report");
+  var sm={};
+  for(var i=0;i<rows.length;i++){var k=rows[i].category||"Uncategorized";sm[k]=(sm[k]||0)+1;}
+  var sk=Object.keys(sm).sort(function(a,b){return sm[b]-sm[a];}),sd=[];
+  for(var i=0;i<sk.length;i++){sd.push({"Category":sk[i],"Count":sm[sk[i]],"% of Total":(sm[sk[i]]/rows.length*100).toFixed(1)+"%"});}
+  var ws2=XLSX.utils.json_to_sheet(sd);
+  ws2["!cols"]=[{wch:36},{wch:10},{wch:14}];
+  XLSX.utils.book_append_sheet(wb,ws2,"Summary");
+  XLSX.writeFile(wb,"Host_Availability_Report.xlsx");
+}
+</script>
+</body>
+</html>
